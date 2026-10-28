@@ -1,0 +1,7 @@
+legacy/
+dist/
+coverage/
+.lighthouseci/
+src/assets/
+assets-source/
+pnpm-lock.yaml

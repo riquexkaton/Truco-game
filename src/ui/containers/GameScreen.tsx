@@ -1,0 +1,57 @@
+import { useEffect, useRef, useState } from 'preact/hooks';
+
+import { ActionsContainer } from '@ui/containers/ActionsContainer';
+import type { GameSession, Launcher } from '@ui/containers/game-session';
+import { MatchHudContainer } from '@ui/containers/MatchHudContainer';
+import { NoticesContainer } from '@ui/containers/NoticesContainer';
+import { AnnouncementContainer, GameOverContainer } from '@ui/containers/SessionContainers';
+import { TABLE_LABEL } from '@ui/copy/hud-copy';
+import { useHandKeys } from '@ui/keyboard/use-hand-keys';
+import { LoadingOverlay } from '@ui/organisms/LoadingOverlay';
+
+interface GameScreenProps {
+  readonly launcher: Launcher;
+}
+
+const HudLayer = ({ session }: { readonly session: GameSession }) => {
+  useHandKeys(session);
+  return (
+    <>
+      <MatchHudContainer session={session} />
+      <ActionsContainer session={session} />
+      <NoticesContainer session={session} />
+    </>
+  );
+};
+
+const useSession = (launcher: Launcher) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [session, setSession] = useState<GameSession | null>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas === null) return;
+    const launch = async () => {
+      setSession(await launcher.launch(canvas));
+    };
+    void launch();
+  }, [launcher]);
+  return { canvasRef, session };
+};
+
+export const GameScreen = ({ launcher }: GameScreenProps) => {
+  const { canvasRef, session } = useSession(launcher);
+  return (
+    <main>
+      <canvas
+        ref={canvasRef}
+        role="img"
+        aria-label={TABLE_LABEL}
+        class="fixed inset-0 block size-full touch-none"
+      />
+      {session === null ? null : <HudLayer session={session} />}
+      <LoadingOverlay isVisible={session === null} />
+      <GameOverContainer session={session} />
+      <AnnouncementContainer session={session} />
+    </main>
+  );
+};
