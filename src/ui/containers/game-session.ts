@@ -9,7 +9,9 @@ export interface GameSession {
   readonly hud: HudView;
 }
 
+type LoadListener = (fraction: number) => void;
+
 export interface Launcher {
   readonly prefetch: () => void;
-  readonly launch: (canvas: HTMLCanvasElement) => Promise<GameSession>;
+  readonly launch: (canvas: HTMLCanvasElement, onProgress: LoadListener) => Promise<GameSession>;
 }

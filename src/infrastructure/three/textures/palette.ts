@@ -3,8 +3,11 @@ export const WASHI_LIGHT = '#F7F0E1';
 export const INK = '#1E1A16';
 export const DORMANT_GREY = '#7D766C';
 export const SEAL_GOLD = '#B08A3E';
-export const GAME_BACK = '#141210';
-export const EFFECT_BACK = '#7A2618';
+export const GAME_BACK = '#120E0A';
+export const EFFECT_BACK = '#0E0B08';
+export const BACK_GOLD = '#C9A35A';
+export const BACK_GOLD_LIGHT = '#D9B66B';
+export const EMBER = '#FF8C3C';
 export const CURSE_VIOLET = '#C9A6FF';
 const CARD_FONT = '"Shippori Mincho", serif';
 

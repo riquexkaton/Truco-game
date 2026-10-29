@@ -7,7 +7,7 @@ import { NoticesContainer } from '@ui/containers/NoticesContainer';
 import { AnnouncementContainer, GameOverContainer } from '@ui/containers/SessionContainers';
 import { TABLE_LABEL } from '@ui/copy/hud-copy';
 import { useHandKeys } from '@ui/keyboard/use-hand-keys';
-import { LoadingOverlay } from '@ui/organisms/LoadingOverlay';
+import { LoadingScreen } from '@ui/organisms/LoadingScreen';
 
 interface GameScreenProps {
   readonly launcher: Launcher;
@@ -27,19 +27,23 @@ const HudLayer = ({ session }: { readonly session: GameSession }) => {
 const useSession = (launcher: Launcher) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [session, setSession] = useState<GameSession | null>(null);
+  const [progress, setProgress] = useState(0);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas === null) return;
+    const report = (fraction: number) => {
+      setProgress((current) => Math.max(current, fraction));
+    };
     const launch = async () => {
-      setSession(await launcher.launch(canvas));
+      setSession(await launcher.launch(canvas, report));
     };
     void launch();
   }, [launcher]);
-  return { canvasRef, session };
+  return { canvasRef, session, progress };
 };
 
 export const GameScreen = ({ launcher }: GameScreenProps) => {
-  const { canvasRef, session } = useSession(launcher);
+  const { canvasRef, session, progress } = useSession(launcher);
   return (
     <main>
       <canvas
@@ -49,7 +53,7 @@ export const GameScreen = ({ launcher }: GameScreenProps) => {
         class="fixed inset-0 block size-full touch-none"
       />
       {session === null ? null : <HudLayer session={session} />}
-      <LoadingOverlay isVisible={session === null} />
+      <LoadingScreen progress={progress} isReady={session !== null} />
       <GameOverContainer session={session} />
       <AnnouncementContainer session={session} />
     </main>

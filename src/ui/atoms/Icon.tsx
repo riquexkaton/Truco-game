@@ -5,12 +5,27 @@ const PATHS = {
   swords: 'M5 4 L19.5 18.5 M19 4 L4.5 18.5 M3.5 16.5 L7.5 20.5 M16.5 20.5 L20.5 16.5',
   ritualLinks: 'M12 9.1 V12.2 M9 14.6 L10.6 13.6 M15 14.6 L13.4 13.6',
   star: 'M12 2 L14.6 9.4 L22 12 L14.6 14.6 L12 22 L9.4 14.6 L2 12 L9.4 9.4 Z',
+  candle:
+    'M12 2.5c1.6 1.8 2.2 3.2 2.2 4.3a2.2 2.2 0 0 1-4.4 0c0-1.1.6-2.5 2.2-4.3z M12 9v2 ' +
+    'M9.5 11h5a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z M6 21h12',
+  expand: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  shrink: 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
 };
 
 const SHIELD_PATH =
   'M20 3 L33 8 V19 C33 28 27 33 20 37 C13 33 7 28 7 19 V8 Z M15 15 L25 25 M25 15 L15 25';
 
-export type IconName = 'plus' | 'cross' | 'leave' | 'swords' | 'rings' | 'ritual' | 'star';
+export type IconName =
+  | 'plus'
+  | 'cross'
+  | 'leave'
+  | 'swords'
+  | 'rings'
+  | 'ritual'
+  | 'star'
+  | 'candle'
+  | 'expand'
+  | 'shrink';
 
 interface IconProps {
   readonly name: IconName;

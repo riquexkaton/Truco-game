@@ -82,6 +82,7 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 ## Rendimiento
 
 - Pantalla de título ligera; Three.js y las texturas se cargan al pulsar JUGAR (prefetch al pasar el puntero o enfocar el botón).
+- Progreso real de carga: `Launcher.launch(canvas, onProgress)`. La composición reporta el `import()` de la mesa (25 %) y `createThreeTable` cuenta el resto de pasos (fuentes, cada fondo y moneda, escena armada) con `createLoadProgress`.
 - Arte de cartas en WebP con nombre con hash (cache inmutable). Solo se esperan las cartas repartidas; el resto se precarga en idle.
 - Sombras: `shadowMap.autoUpdate = false`; se recalculan solo cuando algo se mueve. El render se pausa con la pestaña oculta.
 - Fuente auto-alojada (`@fontsource`), sin CSS bloqueante de terceros.

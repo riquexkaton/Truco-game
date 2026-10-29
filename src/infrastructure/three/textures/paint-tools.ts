@@ -4,6 +4,13 @@ import { WASHI } from '@infrastructure/three/textures/palette';
 export const CARD_LOGICAL_WIDTH = 280;
 const CARD_LOGICAL_HEIGHT = 400;
 
+export const CARD_BOUNDS: Rect = {
+  x: 0,
+  y: 0,
+  width: CARD_LOGICAL_WIDTH,
+  height: CARD_LOGICAL_HEIGHT,
+};
+
 export interface Stroke {
   readonly color: string;
   readonly width: number;

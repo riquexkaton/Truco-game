@@ -1,53 +1,50 @@
-import { PaperButton } from '@ui/atoms/PaperButton';
-import { backgroundUrl } from '@ui/art/art-urls';
-import { TITLE_COPY } from '@ui/copy/hud-copy';
+import { useState } from 'preact/hooks';
+
+import type { TitleCard } from '@ui/art/title-deck';
+import { Icon } from '@ui/atoms/Icon';
+import { MENU_COPY } from '@ui/copy/menu-copy';
+import { MenuInfo } from '@ui/molecules/MenuInfo';
+import { TitleBackdrop } from '@ui/molecules/TitleBackdrop';
+import { FullscreenButton } from '@ui/organisms/FullscreenButton';
+import { MenuFan } from '@ui/organisms/MenuFan';
 
 interface TitleScreenProps {
   readonly onIntent: () => void;
   readonly onStart: () => void;
 }
 
-const Backdrop = () => (
-  <>
-    <picture>
-      <source media="(orientation: portrait)" srcset={backgroundUrl('tall')} type="image/webp" />
-      <img
-        src={backgroundUrl('wide')}
-        alt=""
-        fetchpriority="high"
-        class="absolute inset-0 size-full object-cover"
-      />
-    </picture>
-    <div
-      aria-hidden="true"
-      class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_45%,rgb(7_6_10/0.2),rgb(7_6_10/0.88)_75%)]"
-    />
-  </>
+const TitleHeader = () => (
+  <header class="relative z-20 flex h-[88px] shrink-0 items-center justify-between px-12 motion-safe:animate-drop-in narrow:h-16 narrow:px-4">
+    <div class="flex items-center gap-3.5">
+      <span
+        aria-hidden="true"
+        class="relative grid size-[34px] -rotate-4 place-items-center rounded-[6px] bg-red"
+      >
+        <span class="absolute inset-[3px] rounded-[4px] shadow-[inset_0_0_0_1px_var(--color-washi)]" />
+        <Icon
+          name="candle"
+          class="relative size-[18px] fill-none stroke-washi stroke-[1.7] [stroke-linecap:round] [stroke-linejoin:round]"
+        />
+      </span>
+      <h1 class="text-[15px] leading-none font-extrabold tracking-[0.32em] narrow:text-[13px] narrow:tracking-[0.24em]">
+        {MENU_COPY.title}
+      </h1>
+    </div>
+    <FullscreenButton />
+  </header>
 );
 
-export const TitleScreen = ({ onIntent, onStart }: TitleScreenProps) => (
-  <main class="fixed inset-0 grid place-items-center overflow-hidden bg-night px-4">
-    <Backdrop />
-    <div class="paper-rule wcard flex w-[min(480px,calc(100vw-32px))] flex-col items-center gap-4 px-8 pb-8 text-center">
-      <div
-        aria-hidden="true"
-        class="-mx-[22.5px] mt-[11.5px] h-[34px] self-stretch border-b-[1.5px] border-ink pattern-sg-dark narrow:-mx-[12.5px]"
-      />
-      <div class="wtag">
-        <h1 class="py-2.5 pr-5 pl-[calc(20px+0.3em)] text-[clamp(22px,6vw,34px)] leading-none font-extrabold tracking-[0.3em] text-ink">
-          {TITLE_COPY.title}
-        </h1>
-      </div>
-      <p class="text-[13px] leading-normal font-semibold text-ink/80">{TITLE_COPY.subtitle}</p>
-      <PaperButton
-        variant="hero"
-        onPointerEnter={onIntent}
-        onFocus={onIntent}
-        onTouchStart={onIntent}
-        onClick={onStart}
-      >
-        {TITLE_COPY.play}
-      </PaperButton>
-    </div>
-  </main>
-);
+export const TitleScreen = ({ onIntent, onStart }: TitleScreenProps) => {
+  const [hint, setHint] = useState<TitleCard | null>(null);
+  return (
+    <main class="fixed inset-0 flex flex-col overflow-clip bg-night font-mincho text-washi">
+      <TitleBackdrop />
+      <TitleHeader />
+      <p class="relative mt-[clamp(12px,8.7vh,78px)] shrink-0 pl-[0.4em] text-center text-[14px] leading-[1.2] font-extrabold tracking-[0.4em] [text-shadow:0_2px_16px_rgb(0_0_0/0.8)] motion-safe:animate-prompt">
+        {MENU_COPY.prompt}
+      </p>
+      <MenuFan onIntent={onIntent} onStart={onStart} onHint={setHint} />
+      <MenuInfo card={hint} />
+    </main>
+  );
+};

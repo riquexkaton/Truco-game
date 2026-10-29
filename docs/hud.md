@@ -20,11 +20,20 @@ El HUD sigue el diseño de las cartas, no el de sus ilustraciones: papel, tinta,
 
 ## Patrones (generados en JS como variables CSS)
 
-- `--sg-dark`: olas seigaiha sobre `#141210`, como el reverso de las cartas de juego.
+- `--sg-dark`: olas seigaiha sobre `#141210`.
 - `--sg-ink` y `--sg-green`: olas sobre papel, como el pie de las cartas.
-- `--asa-red`: asanoha sobre `#7A2618`, como el reverso de las cartas de efecto. Se usa para el rival y el Desafío.
+- `--asa-red`: asanoha sobre `#7A2618`. Se usa para el rival y el Desafío.
+
+## Reversos
+
+- **Cartas de juego** («Tapete dorado»): negro `#120E0A`, banda de puntos dorados `#C9A35A`, panel interior con brillo radial, esquinas, varillas con rombos y un medallón de 12 ramas con estrella dorada `#D9B66B`.
+- **Cartas de efecto** («Llama ritual»): la misma banda y panel sobre `#0E0B08`, rombo dorado y gran llama dorada con brillo de brasa. Los efectos boca abajo del rival (`.effect-back`) repiten la llama.
+- Se pintan en canvas (`textures/card-backs.ts`) desde los trazados SVG del diseño de 400×600: los marcos van a todo el ancho y los motivos centrales con escala uniforme.
 
 ## Piezas
+
+- **Pantalla de título** («Abanico de cartas»): sello de vela, «MESA DE LAS VELAS» y botón de pantalla completa. «ELIGE UNA CARTA» sobre un abanico de 4 cartas (JUGAR, REGLAS, MAZO, AJUSTES) que entra repartido; al pasar o enfocar una carta, su descripción aparece debajo. Solo JUGAR funciona: va alzada, con filete dorado y aura; las demás dicen «PRÓXIMAMENTE». El abanico se escala para caber en pantalla.
+- **Carga** («Mazo barajado»): una carta grande inclinada que baraja 16 personajes (nombre y ataque del roster) sobre su propio arte difuminado, contador gigante 000–100 y barra fina con brasa. El porcentaje sale de los pasos reales de carga y solo llega a 100 con la mesa lista; luego se desvanece.
 
 - **Cantar**: sello grande (66 px; 56 px en móvil). Punto rojo = Ritual listo. Al abrirse muestra tiras para Ritual, Pacto y Desafío o Contra, y el sello cambia a una X roja. Encima lleva etiquetas «PACTO · n» y «RONDA · VALE n».
 - **Me voy**: círculo pequeño aparte, para no tocarlo sin querer.

@@ -1,3 +1,4 @@
+import type { CardId } from '@domain/cards/card';
 import type { EffectId } from '@domain/effects/effect';
 
 export type BackgroundKey = 'wide' | 'tall';
@@ -37,6 +38,15 @@ const backgroundUrls = byStem(
   'bg_',
 );
 
+const cardUrls = byStem(
+  import.meta.glob<string>('/src/assets/cards/c_*.jpg', {
+    eager: true,
+    import: 'default',
+    query: { format: 'webp', quality: '80' },
+  }),
+  'c_',
+);
+
 const EFFECT_LOOK: Readonly<Record<EffectId, Omit<EffectArt, 'url'>>> = {
   golpe: { color: '#B23A2A', position: '50% 22%' },
   sanacion: { color: '#3F6B4A', position: '45% 30%' },
@@ -51,3 +61,5 @@ export const effectArt = (effect: EffectId): EffectArt => ({
 });
 
 export const backgroundUrl = (key: BackgroundKey): string => backgroundUrls.get(key) ?? '';
+
+export const cardArtUrl = (id: CardId): string => cardUrls.get(id) ?? '';

@@ -7,16 +7,14 @@ export interface StripCopy {
   readonly subtitle: string;
 }
 
-export const TITLE_COPY = {
-  title: 'MESA DE LAS VELAS',
-  subtitle: 'Truco venezolano a la luz de las velas',
-  play: 'JUGAR',
-};
-
 export const TABLE_LABEL =
   'Mesa de juego a la luz de las velas. Usa las teclas 1, 2 y 3 o toca una carta de tu mano para jugarla.';
 
-export const LOADING_TEXT = 'ENCENDIENDO VELAS';
+export const LOADER_COPY = {
+  label: 'Cargando la mesa',
+  loading: 'ENCENDIENDO VELAS',
+  ready: 'MESA LISTA',
+};
 
 export const HINT_COPY = { play: 'ELIGE UNA CARTA', give: 'ELIGE LA CARTA QUE ENTREGAS' };
 

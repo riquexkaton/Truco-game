@@ -1,13 +1,8 @@
 import type { ButtonHTMLAttributes, ComponentChildren } from 'preact';
 
-export type PaperButtonVariant = 'main' | 'warn' | 'plain' | 'chip' | 'hero';
+export type PaperButtonVariant = 'main' | 'warn' | 'plain' | 'chip';
 
-type ButtonEvents = Pick<
-  ButtonHTMLAttributes,
-  'onClick' | 'onFocus' | 'onPointerEnter' | 'onTouchStart'
->;
-
-interface PaperButtonProps extends ButtonEvents {
+interface PaperButtonProps extends Pick<ButtonHTMLAttributes, 'onClick'> {
   readonly variant: PaperButtonVariant;
   readonly children: ComponentChildren;
 }
@@ -17,7 +12,6 @@ const VARIANTS: Readonly<Record<PaperButtonVariant, string>> = {
   warn: 'min-h-11 px-[18px] bg-washi2 text-red shadow-[inset_0_0_0_1.5px_var(--color-red)]',
   plain: 'min-h-11 px-[18px] bg-washi2 text-ink shadow-[inset_0_0_0_1.5px_var(--color-ink)]',
   chip: 'min-h-11 px-3.5 bg-washi2 text-red shadow-[inset_0_0_0_1.5px_var(--color-red)]',
-  hero: 'min-h-[46px] px-[34px] bg-ink text-washi2',
 };
 
 export const PaperButton = ({ variant, children, ...events }: PaperButtonProps) => (
