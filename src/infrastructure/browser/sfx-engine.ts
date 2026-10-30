@@ -1,6 +1,7 @@
 export interface SoundSpec {
   readonly src: string;
   readonly gain: number;
+  readonly offset: number;
 }
 
 type SoundBank<Id extends string> = Readonly<Record<Id, SoundSpec>>;
@@ -39,13 +40,13 @@ const loadBank = <Id extends string>(state: EngineState<Id>, bank: SoundBank<Id>
   }
 };
 
-const startSound = (context: AudioContext, buffer: AudioBuffer, gain: number): void => {
+const startSound = (context: AudioContext, buffer: AudioBuffer, spec: SoundSpec): void => {
   const source = context.createBufferSource();
   const volume = context.createGain();
   source.buffer = buffer;
-  volume.gain.value = gain;
+  volume.gain.value = spec.gain;
   source.connect(volume).connect(context.destination);
-  source.start();
+  source.start(0, spec.offset);
 };
 
 const suspend = async (context: AudioContext | null): Promise<void> => {
@@ -81,7 +82,7 @@ export const createSfxEngine = <Id extends string>(bank: SoundBank<Id>): SfxEngi
       const { context } = state;
       const buffer = state.buffers.get(id);
       if (buffer === undefined || !state.isAwake || context?.state !== 'running') return;
-      startSound(context, buffer, bank[id].gain);
+      startSound(context, buffer, bank[id]);
     },
   };
 };

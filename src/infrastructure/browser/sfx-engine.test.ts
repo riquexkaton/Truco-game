@@ -5,6 +5,7 @@ import { createSfxEngine } from '@infrastructure/browser/sfx-engine';
 interface Played {
   readonly buffer: unknown;
   readonly gain: number;
+  readonly offset: number | undefined;
 }
 
 interface GainNodeFake {
@@ -13,9 +14,9 @@ interface GainNodeFake {
 }
 
 const BANK = {
-  coin: { src: '/coin.mp3', gain: 0.3 },
-  call: { src: '/call.mp3', gain: 0.7 },
-  broken: { src: '/broken.mp3', gain: 1 },
+  coin: { src: '/coin.mp3', gain: 0.3, offset: 0 },
+  call: { src: '/call.mp3', gain: 0.7, offset: 0.2 },
+  broken: { src: '/broken.mp3', gain: 1, offset: 0 },
 };
 
 const installAudio = () => {
@@ -52,8 +53,8 @@ const installAudio = () => {
           volume = next;
           return next;
         },
-        start: () => {
-          played.push({ buffer: source.buffer, gain: volume?.gain.value ?? 0 });
+        start: (_when?: number, offset?: number) => {
+          played.push({ buffer: source.buffer, gain: volume?.gain.value ?? 0, offset });
         },
       };
       return source;
@@ -90,7 +91,7 @@ describe('the sound effects engine', () => {
     expect(played).toEqual([]);
   });
 
-  it('decodes every sound once and overlaps plays with their own gain', async () => {
+  it('decodes every sound once and overlaps plays with their own gain and offset', async () => {
     const { contexts, played, fetch, engine } = await awakeEngine();
     await engine.wake();
     engine.play('coin');
@@ -99,9 +100,9 @@ describe('the sound effects engine', () => {
     expect(contexts).toHaveLength(1);
     expect(fetch).toHaveBeenCalledTimes(3);
     expect(played).toEqual([
-      { buffer: { text: '/coin.mp3' }, gain: 0.3 },
-      { buffer: { text: '/coin.mp3' }, gain: 0.3 },
-      { buffer: { text: '/call.mp3' }, gain: 0.7 },
+      { buffer: { text: '/coin.mp3' }, gain: 0.3, offset: 0 },
+      { buffer: { text: '/coin.mp3' }, gain: 0.3, offset: 0 },
+      { buffer: { text: '/call.mp3' }, gain: 0.7, offset: 0.2 },
     ]);
   });
 

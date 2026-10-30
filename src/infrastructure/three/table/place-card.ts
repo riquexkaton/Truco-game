@@ -8,6 +8,7 @@ import type { CardPlacement } from '@application/ports/table-port';
 import { calmCard } from '@infrastructure/three/cards/card-motion';
 import { addCurseMark } from '@infrastructure/three/cards/curse-marks';
 import { tableCardOf } from '@infrastructure/three/cards/table-deck';
+import { motionSeconds } from '@infrastructure/three/cards/tween-math';
 import { CARD_Y, FACE_UP, slotPoint } from '@infrastructure/three/layout/table-points';
 import type { Stage } from '@infrastructure/three/stage';
 import { refreshSealMarks } from '@infrastructure/three/table/seal-marking';
@@ -20,6 +21,14 @@ const PLACE_MOTION: PerSide<{ readonly duration: number; readonly rz: number }> 
 
 const SLOT_RISE_PER_DUEL = 0.002;
 const PLACE_LIFT = 0.4;
+const LANDING_SOUND_AT = 0.85;
+
+const playOnLanding = (stage: Stage, seconds: number): void => {
+  const delay = motionSeconds(seconds, stage.reducedMotion) * LANDING_SOUND_AT * 1000;
+  globalThis.setTimeout(() => {
+    stage.sounds.play('cardPlaced');
+  }, delay);
+};
 
 const removeCard = (hand: CardId[], cardId: CardId): void => {
   const index = hand.indexOf(cardId);
@@ -35,6 +44,7 @@ export const placeOnTable = async (stage: Stage, placement: CardPlacement): Prom
   calmCard(card);
   void arrangeSide(stage, side);
   const slot = slotPoint(side, duel);
+  playOnLanding(stage, PLACE_MOTION[side].duration);
   await glide(stage, card, {
     pose: {
       position: new Vector3(slot.x, CARD_Y + SLOT_RISE_PER_DUEL * duel, slot.z),
@@ -44,6 +54,5 @@ export const placeOnTable = async (stage: Stage, placement: CardPlacement): Prom
     duration: PLACE_MOTION[side].duration,
     lift: PLACE_LIFT,
   });
-  stage.sounds.play('cardPlaced');
   if (placement.cursed) addCurseMark(stage.scene, stage.marks, slot);
 };

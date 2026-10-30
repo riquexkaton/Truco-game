@@ -26,24 +26,34 @@ interface SoundEffects {
   readonly play: PlaySound;
 }
 
-interface Loudness {
+interface SoundMix {
   readonly measuredLufs: number;
   readonly targetLufs: number;
+  readonly leadingSilence?: number;
 }
 
 const TARGET_LUFS = { announcement: -21, landing: -23, handling: -24, repeated: -25.5 };
 
-const mixed = (src: string, { measuredLufs, targetLufs }: Loudness): SoundSpec => ({
+const mixed = (src: string, mix: SoundMix): SoundSpec => ({
   src,
-  gain: 10 ** ((targetLufs - measuredLufs) / 20),
+  gain: 10 ** ((mix.targetLufs - mix.measuredLufs) / 20),
+  offset: mix.leadingSilence ?? 0,
 });
 
 const SOUND_BANK: Readonly<Record<SoundId, SoundSpec>> = {
   call: mixed(callUrl, { measuredLufs: -17.7, targetLufs: TARGET_LUFS.announcement }),
   round: mixed(roundUrl, { measuredLufs: -23.2, targetLufs: TARGET_LUFS.announcement }),
-  cardPlaced: mixed(cardPlaceUrl, { measuredLufs: -22.9, targetLufs: TARGET_LUFS.landing }),
+  cardPlaced: mixed(cardPlaceUrl, {
+    measuredLufs: -22.9,
+    targetLufs: TARGET_LUFS.landing,
+    leadingSilence: 0.19,
+  }),
   effectTaken: mixed(cardTakeUrl, { measuredLufs: -24, targetLufs: TARGET_LUFS.handling }),
-  tableCleared: mixed(cardsCollectUrl, { measuredLufs: -26.7, targetLufs: TARGET_LUFS.handling }),
+  tableCleared: mixed(cardsCollectUrl, {
+    measuredLufs: -26.7,
+    targetLufs: TARGET_LUFS.handling,
+    leadingSilence: 0.42,
+  }),
   cardDealt: mixed(cardDealUrl, { measuredLufs: -23.7, targetLufs: TARGET_LUFS.repeated }),
   coinLanded: mixed(coinUrl, { measuredLufs: -15.2, targetLufs: TARGET_LUFS.repeated }),
 };
