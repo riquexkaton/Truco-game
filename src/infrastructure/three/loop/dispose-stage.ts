@@ -1,6 +1,7 @@
 import type { Material, Object3D } from 'three';
-import { InstancedMesh, Mesh, Sprite, Texture } from 'three';
+import { InstancedMesh, Mesh, Points, Sprite, Texture } from 'three';
 
+import { disposeDuelMarks } from '@infrastructure/three/cards/duel-marks';
 import { disposeSealMarks } from '@infrastructure/three/cards/seal-marks';
 import type { Stage } from '@infrastructure/three/stage';
 
@@ -16,7 +17,7 @@ const disposeMaterial = (material: Material): void => {
   material.dispose();
 };
 
-const disposeMesh = (mesh: Mesh): void => {
+const disposeMesh = (mesh: Mesh | Points): void => {
   mesh.geometry.dispose();
   const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
   for (const material of materials) {
@@ -26,7 +27,7 @@ const disposeMesh = (mesh: Mesh): void => {
 
 const disposeObject = (object: Object3D): void => {
   if (object instanceof InstancedMesh) (object as InstancedMesh).dispose();
-  if (object instanceof Mesh) disposeMesh(object as Mesh);
+  if (object instanceof Mesh || object instanceof Points) disposeMesh(object as Mesh | Points);
   if (object instanceof Sprite) disposeMaterial(object.material);
 };
 
@@ -40,6 +41,7 @@ export const disposeStage = (stage: Stage): void => {
     texture?.dispose();
   }
   disposeSealMarks(stage.seals);
+  disposeDuelMarks(stage.duelMarks);
   stage.environment.dispose();
   stage.renderer.dispose();
 };

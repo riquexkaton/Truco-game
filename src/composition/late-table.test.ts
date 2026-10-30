@@ -39,7 +39,7 @@ describe('the late table', () => {
     await port.dealRound({ vira: 'lirio', player: ['garin'], rival: ['teo'] });
     await port.placeCard({ side: 'player', cardId: 'garin', duel: 0, cursed: false });
     await port.arrangeHands({ player: [], rival: [] });
-    port.markDuel({ duel: 0, winner: 'player' });
+    port.markDuel({ duel: 0, result: 'player', attacks: { player: 10, rival: 1 } });
     await port.flyEffect('rival');
     port.moveCoins({ side: 'rival', delta: -2 });
     await port.clearTable();

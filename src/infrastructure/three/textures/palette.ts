@@ -9,6 +9,7 @@ export const BACK_GOLD = '#C9A35A';
 export const BACK_GOLD_LIGHT = '#D9B66B';
 export const EMBER = '#FF8C3C';
 export const CURSE_VIOLET = '#C9A6FF';
+export const STAMP_RED = '#8E2A2A';
 const CARD_FONT = '"Shippori Mincho", serif';
 
 export const hexAlpha = (hex: string, alpha: number): string => {

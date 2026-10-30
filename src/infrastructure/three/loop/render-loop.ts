@@ -10,6 +10,7 @@ import { setBackgroundFlicker } from '@infrastructure/three/scene/background';
 import { flickerCandles } from '@infrastructure/three/scene/candles';
 import { backgroundFlicker } from '@infrastructure/three/scene/pulses';
 import type { Stage } from '@infrastructure/three/stage';
+import { updateDuelMarks } from '@infrastructure/three/table/duel-marking';
 
 const MAX_DELTA_SECONDS = 0.05;
 
@@ -25,7 +26,8 @@ const animate = (stage: Stage, frame: GlowFrame): void => {
     reducedMotion: stage.reducedMotion,
   });
   setBackgroundFlicker(stage.background, backgroundFlicker(noise));
-  updateGlows(stage.glows, frame);
+  updateGlows(stage.glows, frame, stage.reducedMotion);
+  updateDuelMarks(stage, frame.deltaSeconds);
   const cards = visibleCards(stage.deck.everyCard);
   if (isTableMoving(stage, cards)) stage.shadowsDirty = true;
   updateCoinFlights(stage.coins, frame.deltaSeconds);

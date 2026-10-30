@@ -4,10 +4,10 @@ import type {
   CloseUpCard as CloseUpCardCopy,
   CloseUpModel,
   CloseUpResult,
-  ResultTone,
 } from '@ui/copy/close-up-copy';
 import { CLOSE_UP_COPY, closeUpTab } from '@ui/copy/close-up-copy';
 import { CloseUpCard } from '@ui/molecules/CloseUpCard';
+import { ResultStamp } from '@ui/molecules/ResultStamp';
 import { SealNote } from '@ui/molecules/SealNote';
 
 interface CloseUpDuelProps {
@@ -19,12 +19,6 @@ interface ColumnProps {
   readonly card: CloseUpCardCopy;
   readonly model: CloseUpModel;
 }
-
-const RESULT_LOOKS: Readonly<Record<ResultTone, string>> = {
-  win: 'bg-green shadow-[inset_0_0_0_2px_var(--color-green),inset_0_0_0_3px_var(--color-washi)]',
-  lose: 'bg-red shadow-[inset_0_0_0_2px_var(--color-red),inset_0_0_0_3px_var(--color-washi)]',
-  tie: 'bg-tie shadow-[inset_0_0_0_2px_var(--color-tie),inset_0_0_0_3px_var(--color-washi)]',
-};
 
 const TAB =
   'h-11 cursor-pointer text-[11px] font-extrabold tracking-[2px] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-gilt';
@@ -49,15 +43,16 @@ const Versus = ({ result }: { readonly result: CloseUpResult | null }) => (
     <span class="text-[14px] font-extrabold tracking-[4px] text-washi/60">
       {CLOSE_UP_COPY.versus}
     </span>
-    {result === null ? null : (
-      <span
-        class={`-rotate-6 py-1.5 pr-[9px] pl-3 text-[13px] font-extrabold tracking-[3px] text-washi2 ${RESULT_LOOKS[result.tone]}`}
-      >
-        {result.text}
-      </span>
-    )}
+    {result === null ? null : <ResultStamp result={result} />}
   </div>
 );
+
+const TallResult = ({ result }: { readonly result: CloseUpResult | null }) =>
+  result === null ? null : (
+    <div class="-my-1 hidden tall:block">
+      <ResultStamp result={result} />
+    </div>
+  );
 
 const Tabs = ({ model, onShow }: CloseUpDuelProps) =>
   model.cards.length < 2 ? null : (
@@ -103,6 +98,7 @@ export const CloseUpDuel = ({ model, onShow }: CloseUpDuelProps) => {
         {second === undefined ? null : <Versus result={model.result} />}
         {second === undefined ? null : <CardColumn card={second} model={model} />}
       </div>
+      <TallResult result={model.result} />
       <Tabs model={model} onShow={onShow} />
       <Footer />
     </div>

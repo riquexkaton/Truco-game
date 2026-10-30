@@ -3,6 +3,7 @@ import { hideSealMarks } from '@infrastructure/three/cards/seal-marks';
 import type { TableCard } from '@infrastructure/three/cards/table-card';
 import { tableCardOf } from '@infrastructure/three/cards/table-deck';
 import type { Stage } from '@infrastructure/three/stage';
+import { clearDuelMarks } from '@infrastructure/three/table/duel-marking';
 import { deckPose, glide } from '@infrastructure/three/table/stage-motion';
 
 const CLEAR_STAGGER_MS = 40;
@@ -28,6 +29,7 @@ const forgetTable = (stage: Stage): void => {
 
 export const clearTable = async (stage: Stage): Promise<void> => {
   stage.listener.tableCleared();
+  clearDuelMarks(stage);
   clearCurseMarks(stage.marks);
   hideSealMarks(stage.seals);
   const cards = cardsOnTable(stage);

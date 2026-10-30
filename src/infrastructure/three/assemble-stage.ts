@@ -11,10 +11,12 @@ import type { StageAssets } from '@infrastructure/three/assets/stage-assets';
 import { loadStageAssets } from '@infrastructure/three/assets/stage-assets';
 import { addDeckBoxes } from '@infrastructure/three/cards/deck-boxes';
 import { createDuelGlows } from '@infrastructure/three/cards/duel-glows';
+import { createDuelMarks } from '@infrastructure/three/cards/duel-marks';
 import { createSealMarks } from '@infrastructure/three/cards/seal-marks';
 import { createTableDeck } from '@infrastructure/three/cards/table-deck';
 import { resetCoins } from '@infrastructure/three/coins/coin-actions';
 import { createCoinTable } from '@infrastructure/three/coins/coin-table';
+import { warmDuelFx } from '@infrastructure/three/fx/duel-fx';
 import { createSealTrack } from '@infrastructure/three/interaction/seal-track';
 import type { Layout } from '@infrastructure/three/layout/layouts';
 import { layoutFor } from '@infrastructure/three/layout/layouts';
@@ -69,7 +71,9 @@ const buildPieces = (view: StageView, assets: StageAssets, options: StageOptions
   });
   resetCoins(coins);
   const glows = createDuelGlows(scene, radial.glow);
-  return { glows, deck, coins, marks: [], seals: createSealMarks(kit) };
+  const duelMarks = createDuelMarks(kit, scene);
+  warmDuelFx(duelMarks.fx, view);
+  return { glows, deck, coins, marks: [], seals: createSealMarks(kit), duelMarks };
 };
 
 export const assembleStage = async (

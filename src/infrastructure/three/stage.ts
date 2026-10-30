@@ -18,6 +18,7 @@ import type { GameStore } from '@application/store/game-store';
 
 import type { ArtLibrary } from '@infrastructure/browser/art-library';
 import type { DuelGlow } from '@infrastructure/three/cards/duel-glows';
+import type { DuelMarks } from '@infrastructure/three/cards/duel-marks';
 import type { SealMarks } from '@infrastructure/three/cards/seal-marks';
 import type { TableDeck } from '@infrastructure/three/cards/table-deck';
 import type { CoinTable } from '@infrastructure/three/coins/coin-table';
@@ -44,6 +45,7 @@ export interface StagePieces {
   readonly coins: CoinTable;
   readonly marks: Sprite[];
   readonly seals: SealMarks;
+  readonly duelMarks: DuelMarks;
 }
 
 interface StageServices {

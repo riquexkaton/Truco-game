@@ -3,6 +3,8 @@ import { AdditiveBlending, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial 
 
 import type { CardMotionState } from '@infrastructure/three/cards/card-state';
 import { restingMotion } from '@infrastructure/three/cards/card-state';
+import type { CardTint } from '@infrastructure/three/cards/card-tint';
+import { createCardTint, tintMaterial } from '@infrastructure/three/cards/card-tint';
 
 export interface TableCard extends CardMotionState {
   readonly group: Group;
@@ -11,6 +13,7 @@ export interface TableCard extends CardMotionState {
   readonly frontMaterial: MeshStandardMaterial;
   readonly glareMaterial: MeshBasicMaterial;
   readonly glareMap: Texture;
+  readonly tint: CardTint;
 }
 
 export interface CardKit {
@@ -63,6 +66,8 @@ export const createTableCard = (kit: CardKit, skin: CardSkin): TableCard => {
   const back = cardSide(kit, skin.back, -FACE_GAP);
   back.rotation.y = Math.PI;
   const glare = createGlare(kit);
+  const tint = createCardTint();
+  tintMaterial(front.material, tint);
   const group = new Group();
   group.add(front, back, glare.mesh);
   group.visible = false;
@@ -75,5 +80,6 @@ export const createTableCard = (kit: CardKit, skin: CardSkin): TableCard => {
     frontMaterial: front.material,
     glareMaterial: glare.material,
     glareMap: glare.map,
+    tint,
   };
 };

@@ -1,5 +1,6 @@
 import type { CardId } from '@domain/cards/card';
 import type { FactionId } from '@domain/cards/faction';
+import type { DuelResult } from '@domain/duel/duel';
 import type { PerSide, Side } from '@domain/shared/side';
 
 export interface RoundDeal {
@@ -17,7 +18,8 @@ export interface CardPlacement {
 
 export interface DuelMark {
   readonly duel: number;
-  readonly winner: Side;
+  readonly result: DuelResult;
+  readonly attacks: PerSide<number>;
 }
 
 export interface CoinMove {

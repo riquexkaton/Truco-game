@@ -1,17 +1,23 @@
 import type { Scene, Texture } from 'three';
-import { AdditiveBlending, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import {
+  AdditiveBlending,
+  Color,
+  Mesh,
+  MeshBasicMaterial,
+  PlaneGeometry,
+  SRGBColorSpace,
+} from 'three';
 
-import type { PerSide } from '@domain/shared/side';
+import type { Side } from '@domain/shared/side';
 
-import type { DuelMark } from '@application/ports/table-port';
-
+import { WARM_LIGHT } from '@infrastructure/three/cards/duel-look';
 import type { TablePoint } from '@infrastructure/three/layout/table-points';
 import { DUEL_SLOTS, TABLE_Y } from '@infrastructure/three/layout/table-points';
 import { glowLevel } from '@infrastructure/three/scene/pulses';
 
 export interface DuelGlow {
   readonly material: MeshBasicMaterial;
-  isLit: boolean;
+  level: number;
 }
 
 export interface GlowFrame {
@@ -19,8 +25,14 @@ export interface GlowFrame {
   readonly deltaSeconds: number;
 }
 
-const WINNER_COLORS: PerSide<number> = { player: 0xff_c6_70, rival: 0xc2_4a_3a };
-const GLOW_RATE = 4;
+export interface GlowTarget {
+  readonly duel: number;
+  readonly side: Side;
+  readonly level: number;
+}
+
+const POOL_SIZE = { width: 1.5, depth: 1.4 };
+const GLOW_RATE = 9;
 
 interface GlowKit {
   readonly scene: Scene;
@@ -31,6 +43,7 @@ interface GlowKit {
 const createGlow = ({ scene, geometry, map }: GlowKit, point: TablePoint): DuelGlow => {
   const material = new MeshBasicMaterial({
     map,
+    color: new Color().setRGB(WARM_LIGHT.r, WARM_LIGHT.g, WARM_LIGHT.b, SRGBColorSpace),
     transparent: true,
     opacity: 0,
     blending: AdditiveBlending,
@@ -40,32 +53,31 @@ const createGlow = ({ scene, geometry, map }: GlowKit, point: TablePoint): DuelG
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.set(point.x, TABLE_Y + 0.003, point.z);
   scene.add(mesh);
-  return { material, isLit: false };
+  return { material, level: 0 };
 };
 
 export const createDuelGlows = (scene: Scene, glowTexture: Texture): DuelGlow[] => {
-  const kit: GlowKit = { scene, geometry: new PlaneGeometry(1.35, 1.7), map: glowTexture };
+  const geometry = new PlaneGeometry(POOL_SIZE.width, POOL_SIZE.depth);
+  const kit: GlowKit = { scene, geometry, map: glowTexture };
   return [...DUEL_SLOTS.player, ...DUEL_SLOTS.rival].map((point) => createGlow(kit, point));
 };
 
 export const resetGlows = (glows: readonly DuelGlow[]): void => {
   for (const glow of glows) {
     glow.material.opacity = 0;
-    glow.isLit = false;
+    glow.level = 0;
   }
 };
 
-export const lightGlow = (glows: readonly DuelGlow[], mark: DuelMark): void => {
-  const glow = glows[(mark.winner === 'player' ? 0 : DUEL_SLOTS.player.length) + mark.duel];
-  if (glow === undefined) return;
-  glow.material.color.set(WINNER_COLORS[mark.winner]);
-  glow.isLit = true;
+export const lightGlow = (glows: readonly DuelGlow[], { duel, side, level }: GlowTarget): void => {
+  const glow = glows[(side === 'player' ? 0 : DUEL_SLOTS.player.length) + duel];
+  if (glow !== undefined) glow.level = level;
 };
 
-export const updateGlows = (glows: readonly DuelGlow[], frame: GlowFrame): void => {
-  const rate = Math.min(1, frame.deltaSeconds * GLOW_RATE);
+export const updateGlows = (glows: readonly DuelGlow[], frame: GlowFrame, isReduced: boolean) => {
+  const rate = isReduced ? 1 : Math.min(1, frame.deltaSeconds * GLOW_RATE);
   for (const glow of glows) {
-    const target = glowLevel(glow.isLit, frame.time);
+    const target = glowLevel(glow.level > 0, frame.time) * glow.level;
     glow.material.opacity += (target - glow.material.opacity) * rate;
   }
 };

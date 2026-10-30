@@ -3,11 +3,11 @@ import type { PerSide } from '@domain/shared/side';
 
 import type { TablePort } from '@application/ports/table-port';
 
-import { lightGlow } from '@infrastructure/three/cards/duel-glows';
 import { moveCoins, resetCoins } from '@infrastructure/three/coins/coin-actions';
 import type { Stage } from '@infrastructure/three/stage';
 import { clearTable } from '@infrastructure/three/table/clear-table';
 import { dealRound } from '@infrastructure/three/table/deal-round';
+import { markDuelOnTable } from '@infrastructure/three/table/duel-marking';
 import { flyEffect } from '@infrastructure/three/table/effect-flight';
 import { placeOnTable } from '@infrastructure/three/table/place-card';
 import { refreshSealMarks } from '@infrastructure/three/table/seal-marking';
@@ -26,7 +26,7 @@ export const createTableAdapter = (stage: Stage): TablePort => ({
   placeCard: (placement) => placeOnTable(stage, placement),
   arrangeHands: (hands) => arrangeHands(stage, hands),
   markDuel: (mark) => {
-    lightGlow(stage.glows, mark);
+    markDuelOnTable(stage, mark);
   },
   flyEffect: (side) => flyEffect(stage, side),
   moveCoins: (move) => {
