@@ -38,11 +38,19 @@ export interface EffectChoice {
   readonly effect: EffectId;
 }
 
+export type EffectBlock = 'turn' | 'used' | 'noPlunderTarget';
+
 const hasPlunderTargets = (state: MatchState, side: Side): boolean =>
   state.hands[side].length > 0 && state.hands[opponent(side)].length > 0;
 
-export const canUseEffect = (state: MatchState, { side, effect }: EffectChoice): boolean =>
-  isAwaitingCard(state, side) &&
-  !state.usedEffectThisTurn &&
-  state.effects.stored[side].includes(effect) &&
-  (effect !== 'saqueo' || hasPlunderTargets(state, side));
+export const effectBlock = (
+  state: MatchState,
+  { side, effect }: EffectChoice,
+): EffectBlock | null => {
+  if (!isAwaitingCard(state, side)) return 'turn';
+  if (state.usedEffectThisTurn) return 'used';
+  return effect === 'saqueo' && !hasPlunderTargets(state, side) ? 'noPlunderTarget' : null;
+};
+
+export const canUseEffect = (state: MatchState, choice: EffectChoice): boolean =>
+  state.effects.stored[choice.side].includes(choice.effect) && effectBlock(state, choice) === null;

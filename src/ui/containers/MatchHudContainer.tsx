@@ -20,15 +20,17 @@ const sideView = ({ store, hud }: GameSession, side: Side): SideHudProps => ({
 });
 
 const EffectsContainer = ({ session }: ContainerProps) => {
-  const { store, commands } = session;
+  const { store, commands, hud } = session;
   const effects = store.playerEffects.value.map((effect) => ({
     effect,
-    isUsable: store.canUseEffect(effect),
+    block: store.effectBlock(effect),
   }));
   const playEffect = (effect: EffectId) => {
     commands.useEffect(effect);
   };
-  return <EffectsTray effects={effects} onUse={playEffect} />;
+  return (
+    <EffectsTray effects={effects} promptId={hud.prompt.value?.id ?? null} onUse={playEffect} />
+  );
 };
 
 export const MatchHudContainer = ({ session }: ContainerProps) => (

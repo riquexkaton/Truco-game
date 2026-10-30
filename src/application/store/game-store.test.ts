@@ -82,6 +82,7 @@ describe('the game store', () => {
     await harness.until(() => harness.store.phase.value === 'rival');
     expect(harness.store.turnSide.value).toBe('rival');
     expect(harness.store.canPlayCard.value).toBe(false);
+    expect(harness.store.effectBlock('golpe')).toBe('turn');
   });
 
   it('ignores commands that are not allowed', async () => {

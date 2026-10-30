@@ -4,12 +4,14 @@ import { computed } from '@preact/signals-core';
 import type { ChallengeLevel } from '@domain/challenge/challenge';
 import { NO_CHALLENGE, STAKES } from '@domain/challenge/challenge';
 import type { EffectId } from '@domain/effects/effect';
+import type { EffectBlock } from '@domain/match/gates';
 import {
   canCallPact,
   canFold,
   canRaiseChallenge,
   canSingRitual,
   canUseEffect,
+  effectBlock,
 } from '@domain/match/gates';
 import type { MatchState } from '@domain/match/match-state';
 import { hasPlaced } from '@domain/match/queries';
@@ -33,6 +35,7 @@ export interface ActionModels {
   readonly ritualReady: ReadonlySignal<boolean>;
   readonly canFold: ReadonlySignal<boolean>;
   readonly canUseEffect: (effect: EffectId) => boolean;
+  readonly effectBlock: (effect: EffectId) => EffectBlock | null;
 }
 
 type Gate = (state: MatchState) => boolean;
@@ -46,6 +49,13 @@ const canPlayerDo = (signals: GameSignals, isAllowed: Gate): boolean => {
 
 const gateModel = (signals: GameSignals, isAllowed: Gate): ReadonlySignal<boolean> =>
   computed(() => canPlayerDo(signals, isAllowed));
+
+const playerEffectBlock = (signals: GameSignals, effect: EffectId): EffectBlock | null => {
+  const state = signals.match.value;
+  return state === null || !canPlayerAct(signals)
+    ? 'turn'
+    : effectBlock(state, { side: 'player', effect });
+};
 
 const isRitualReady = (state: MatchState | null): boolean =>
   state !== null &&
@@ -66,4 +76,5 @@ export const createActionModels = (signals: GameSignals): ActionModels => ({
   canFold: gateModel(signals, (state) => canFold(state, 'player')),
   canUseEffect: (effect) =>
     canPlayerDo(signals, (state) => canUseEffect(state, { side: 'player', effect })),
+  effectBlock: (effect) => playerEffectBlock(signals, effect),
 });

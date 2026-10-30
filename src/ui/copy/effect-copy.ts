@@ -1,4 +1,5 @@
 import type { EffectId } from '@domain/effects/effect';
+import type { EffectBlock } from '@domain/match/gates';
 import type { Side } from '@domain/shared/side';
 
 import { bySide, plural } from '@ui/copy/text';
@@ -27,10 +28,20 @@ export const RIVAL_EFFECT_COPY: Readonly<Record<EffectId, string>> = {
 export const effectLabel = (effect: EffectId): string =>
   `${EFFECT_COPY[effect].name}: ${EFFECT_COPY[effect].description}`;
 
-export const effectTitle = (effect: EffectId): string =>
-  `${EFFECT_COPY[effect].name} · ${EFFECT_COPY[effect].description}`;
+export const EFFECT_BLOCK_COPY: Readonly<Record<EffectBlock, string>> = {
+  turn: 'Úsala en tu turno, antes de jugar tu carta.',
+  used: 'Ya usaste un efecto este turno.',
+  noPlunderTarget: 'El rival no tiene cartas en la mano.',
+};
+
+export const EFFECT_TIP_USE = 'USAR';
+
+export const effectUseLabel = (effect: EffectId): string =>
+  `${EFFECT_TIP_USE} ${EFFECT_COPY[effect].name}`;
 
 export const revealOwner = (side: Side): string => bySide(side, 'TÚ', 'RIVAL');
+
+export const REVEAL_ANNULLED = 'ANULADO';
 
 export const rivalEffectsLabel = (count: number): string =>
   `El rival guarda ${plural(count, 'efecto', 's')}`;

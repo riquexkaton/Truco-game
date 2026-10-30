@@ -26,6 +26,7 @@ describe('effects', () => {
     commands.singRitual();
     await harness.untilIdle();
     expect(store.canUseEffect('golpe')).toBe(true);
+    expect(store.effectBlock('golpe')).toBeNull();
     commands.useEffect('golpe');
     await harness.untilIdle();
     expect(hud.eventsOf('effectUsed')).toEqual([
@@ -34,6 +35,7 @@ describe('effects', () => {
     expect(store.lives.value.rival).toBe(15);
     expect(store.playerEffects.value).toEqual([]);
     expect(store.canUseEffect('golpe')).toBe(false);
+    expect(store.effectBlock('golpe')).toBe('used');
   });
 
   it('annuls the next rival effect with a Sello', async () => {

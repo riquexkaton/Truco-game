@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { placeCard } from '@domain/match/duel-play';
 import { activateEffect, plunder } from '@domain/match/effect-use';
-import { canUseEffect } from '@domain/match/gates';
+import { canUseEffect, effectBlock } from '@domain/match/gates';
 import { handsOf, matchFixture } from '@domain/match/match-fixture';
 import { matchWinner, playedAttack, slotOf } from '@domain/match/queries';
 import { scriptedRandom } from '@domain/shared/scripted-random';
@@ -91,6 +91,19 @@ describe('canUseEffect', () => {
     expect(canUseEffect(armed, { side: 'player', effect: 'saqueo' })).toBe(true);
     const empty = { ...armed, hands: handsOf(['saul'], []) };
     expect(canUseEffect(empty, { side: 'player', effect: 'saqueo' })).toBe(false);
+  });
+});
+
+describe('effectBlock', () => {
+  it('tells why an effect cannot be used right now', () => {
+    expect(effectBlock(armed, { side: 'player', effect: 'golpe' })).toBeNull();
+    const placed = placeCard(armed, { side: 'player', cardId: 'saul' });
+    expect(effectBlock(placed, { side: 'player', effect: 'golpe' })).toBe('turn');
+    const used = activateEffect(armed, { side: 'player', effect: 'golpe' }).state;
+    expect(effectBlock(used, { side: 'player', effect: 'sello' })).toBe('used');
+    const empty = { ...armed, hands: handsOf(['saul'], []) };
+    expect(effectBlock(empty, { side: 'player', effect: 'saqueo' })).toBe('noPlunderTarget');
+    expect(effectBlock(empty, { side: 'player', effect: 'golpe' })).toBeNull();
   });
 });
 
