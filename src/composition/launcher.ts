@@ -10,7 +10,9 @@ import type { createThreeTable } from '@infrastructure/three/create-three-table'
 import type { GameSession, Launcher } from '@ui/containers/game-session';
 import { createHud } from '@ui/hud/create-hud';
 
+import { withHudSounds } from './hud-sounds';
 import { createLateTable } from './late-table';
+import type { PlaySound } from './sound-effects';
 
 interface TableModule {
   readonly createThreeTable: typeof createThreeTable;
@@ -18,19 +20,24 @@ interface TableModule {
 
 type LoadTable = () => Promise<TableModule>;
 
+interface LaunchServices {
+  readonly loadTable: LoadTable;
+  readonly playSound: PlaySound;
+}
+
 const TABLE_CODE_SHARE = 0.25;
 
 const launchGame = async (
   canvas: HTMLCanvasElement,
-  loadTable: LoadTable,
   onProgress: ProgressListener,
+  { loadTable, playSound }: LaunchServices,
 ): Promise<GameSession> => {
   const isReducedMotion = isReducedMotionPreferred();
   const hud = createHud({ reducedMotion: isReducedMotion });
   const table = createLateTable();
   const { store, commands } = createGame({
     table: table.port,
-    hud: hud.port,
+    hud: withHudSounds(hud.port, playSound),
     scheduler: createBrowserScheduler({ reducedMotion: isReducedMotion }),
     random: createBrowserRandom(),
   });
@@ -40,15 +47,17 @@ const launchGame = async (
     canvas,
     store,
     onPickCard: commands.playCard,
+    listener: hud.table,
     reducedMotion: isReducedMotion,
     onProgress: progressAfter(TABLE_CODE_SHARE, onProgress),
+    sounds: { play: playSound },
   });
   table.bind(three.table);
   commands.start();
   return { store, commands, hud: hud.view };
 };
 
-export const createLauncher = (): Launcher => {
+export const createLauncher = (playSound: PlaySound): Launcher => {
   let pending: Promise<TableModule> | null = null;
   const loadTable: LoadTable = () => {
     pending ??= import('@infrastructure/three/create-three-table');
@@ -58,6 +67,6 @@ export const createLauncher = (): Launcher => {
     prefetch: () => {
       void loadTable();
     },
-    launch: (canvas, onProgress) => launchGame(canvas, loadTable, onProgress),
+    launch: (canvas, onProgress) => launchGame(canvas, onProgress, { loadTable, playSound }),
   };
 };

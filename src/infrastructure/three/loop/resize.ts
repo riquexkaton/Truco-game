@@ -3,6 +3,7 @@ import { fitCamera, placeHandLight } from '@infrastructure/three/layout/camera-r
 import { backgroundUvRect, layoutFor } from '@infrastructure/three/layout/layouts';
 import { setBackgroundView } from '@infrastructure/three/scene/background';
 import type { Stage } from '@infrastructure/three/stage';
+import { refreshSealMarks } from '@infrastructure/three/table/seal-marking';
 import { arrangeSide } from '@infrastructure/three/table/stage-motion';
 
 const shouldRearrangeHand = (stage: Stage): boolean =>
@@ -22,6 +23,7 @@ export const resizeStage = (stage: Stage): void => {
     uvRect: backgroundUvRect(layout.aspect, view),
   });
   placeHandLight(stage.handLight, stage.camera, layout);
+  refreshSealMarks(stage);
   if (shouldRearrangeHand(stage)) void arrangeSide(stage, 'player');
   stage.shadowsDirty = true;
 };

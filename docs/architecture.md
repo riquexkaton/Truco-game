@@ -34,7 +34,7 @@ domain/
   shared/      Side ('player' | 'rival'), opponent(), Random (interfaz), shuffle/pick/chance puros
   cards/       facciones, mazo de 40 (datos), attackOf, effectiveAttack, hasSeal
   duel/        resultado de duelo, estado de la ronda (2 de 3), quién lidera
-  challenge/   Desafío/Contra: niveles [2,4,6], canRaise, daño por retirarse (1 / 4)
+  challenge/   Desafío/Contra: niveles [2,4,6], canRaise, daño por retirarse (1 / 4) y por irse (1 / 4 / 6)
   pact/        valor del Pacto (envido), apuestas Pacto/Re-pacto/Apuesta, rango, rechazo, ganador
   ritual/      detección (3 de la misma facción), daño 3
   effects/     catálogo (golpe, sanacion, saqueo, maldicion, sello), mazo de 20, robar/rebarajar, máx. 2
@@ -62,7 +62,7 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 
 ## Application
 
-- `ports/`: `TablePort` (animaciones 3D, todas devuelven `Promise`), `HudPort` (banner, toast, ask, reveal, hint, announce), `Scheduler` (`wait(ms)`), `Random`.
+- `ports/`: `TablePort` (animaciones 3D, todas devuelven `Promise`), `HudPort` (`notify(evento)` y `ask(pregunta)`; `notify` se resuelve cuando el aviso deja de verse, así que un anuncio grande hace esperar al juego hasta que se toca o termina su tiempo de lectura; mientras tanto `signals.announcing` para el reloj del turno), `Scheduler` (`wait(ms)`), `Random`, `TableListener` (la mesa 3D avisa a la UI de una carta jugada tocada, de la carta con sello bajo el ratón y de que se recogió la mesa; lo une `composition/launcher.ts`).
 - `store/`: estado observable con `@preact/signals-core` (vida, resultados de duelos, apuesta, Pacto en juego, efectos, maldición/sello, fase, temporizador). La UI solo lee de aquí y llama comandos.
 - Casos de uso por carpeta (`round/`, `challenge/`, `pact/`, `effects/`, `turn-timer/`) que reciben sus dependencias por parámetro. Nada de singletons.
 - `GameCommands`: `start`, `playCard`, `callChallenge`, `callPact`, `singRitual`, `fold`, `useEffect`, `restart`.
@@ -71,10 +71,12 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 
 - `three/`: un archivo por pieza (renderer, fondo, velas, entorno, monedas, carta, pintores de textura, layouts, picking, loop, adaptador). Se carga con `import()` dinámico al pulsar JUGAR.
 - `browser/`: `Scheduler` con `setTimeout` (acorta esperas con reduced motion), `Random` con `Math.random`, carga de imágenes con `createImageBitmap`.
+- Música de fondo: `composition/background-music.ts` une `music-track` (un `Audio` en bucle que se crea en el primer gesto y entra con fundido), `music-preference` (`localStorage`) y `page-activity` (primer gesto, visibilidad) en un `MusicControl` que `main.tsx` pasa a `App`. La UI solo lee `isEnabled` y llama a `toggle`. El encendido, el primer gesto y la visibilidad viven en `composition/audio-toggle.ts`, compartido con los efectos.
+- Efectos de sonido: `composition/sound-effects.ts` crea `sfx-engine` (Web Audio: un `AudioContext`, buffers decodificados y un `BufferSource` nuevo por sonido, así se superponen) y lo une con `sfx-preference` y `page-activity` en un `SfxControl` aparte. Los sonidos se descargan y decodifican después del primer gesto; si falta uno, no suena. El volumen de cada sonido es dato: sonoridad medida y objetivo en LUFS. Se disparan desde dos sitios: `composition/hud-sounds.ts` envuelve el `HudPort` (llamadas de Pacto o Desafío, turnos, ronda y fin de partida) y la mesa 3D recibe `TableSounds` (`three/table/table-sounds.ts`) para sonar cuando la carta llega a la mano o a la mesa, al recoger, al tomar un efecto y cuando cada moneda toca la mesa.
 
 ## UI
 
-- `atoms/` (Hanko, PaperTag, PaperButton…), `molecules/` (Toast, LifeCounter, Pips…), `organisms/` (ActionBar, PromptDialog, Banner, TurnBar, GameOver, TitleScreen…).
+- `atoms/` (Hanko, PaperTag, AsideButton…), `molecules/` (AnswerButton, HeadlineSheet, DuelBand, LifeCounter…), `organisms/` (ActionBar, PromptCard, Headline, Mark, Banner, TurnBar, GameOver, TitleScreen…).
 - `containers/` conectan el store y los comandos con componentes presentacionales puros (props in, eventos out).
 - Estilos: Tailwind 4 primero (`@theme` con los tokens de `docs/hud.md`); CSS propio solo para keyframes, patrones y pseudo-elementos que Tailwind no cubre.
 - Accesibilidad: `aria-label`, foco visible, región `aria-live`, `prefers-reduced-motion`.

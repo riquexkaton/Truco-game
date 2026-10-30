@@ -3,35 +3,30 @@ import { Raycaster, Vector2 } from 'three';
 
 import type { CardId } from '@domain/cards/card';
 
-import { calmCard } from '@infrastructure/three/cards/card-motion';
+import type { PlayedCardPick } from '@application/ports/table-listener';
+
 import type { TableCard } from '@infrastructure/three/cards/table-card';
 
+type PickTarget =
+  | { readonly kind: 'hand'; readonly cardId: CardId }
+  | { readonly kind: 'table'; readonly pick: PlayedCardPick };
+
 export interface PickCandidate {
-  readonly cardId: CardId;
+  readonly target: PickTarget;
   readonly card: TableCard;
+}
+
+export interface PickHit {
+  readonly candidate: PickCandidate;
+  readonly uv: Vector2 | undefined;
 }
 
 export interface PickingOptions {
   readonly canvas: HTMLCanvasElement;
   readonly camera: PerspectiveCamera;
-  readonly reducedMotion: boolean;
   readonly candidates: () => readonly PickCandidate[];
-  readonly isActive: () => boolean;
-  readonly onPick: (cardId: CardId) => void;
-}
-
-export interface Picking {
-  readonly release: () => void;
-  readonly detach: () => void;
-}
-
-interface PickHit {
-  readonly candidate: PickCandidate;
-  readonly uv: Vector2 | undefined;
-}
-
-interface HoverState {
-  hovered: TableCard | null;
+  readonly onMove: (hit: PickHit | null, event: PointerEvent) => void;
+  readonly onSelect: (hit: PickHit) => void;
 }
 
 const raycaster = new Raycaster();
@@ -54,52 +49,24 @@ const pickAt = (options: PickingOptions, event: MouseEvent): PickHit | null => {
   return candidate === undefined ? null : { candidate, uv: hit.uv };
 };
 
-const hover = (state: HoverState, card: TableCard | null): void => {
-  if (card === state.hovered) return;
-  if (state.hovered !== null) calmCard(state.hovered);
-  state.hovered = card;
-  if (card !== null) card.hoverTarget = 1;
-};
-
-const canTilt = (options: PickingOptions, event: PointerEvent): boolean =>
-  !options.reducedMotion && event.pointerType !== 'touch';
-
-const onPointerMove = (options: PickingOptions, state: HoverState, event: PointerEvent): void => {
-  const hit = options.isActive() ? pickAt(options, event) : null;
-  hover(state, hit?.candidate.card ?? null);
-  if (hit?.uv !== undefined && canTilt(options, event)) {
-    hit.candidate.card.tiltTarget.set(hit.uv.x - 0.5, hit.uv.y - 0.5);
-  }
-  options.canvas.style.cursor = hit === null ? '' : 'pointer';
-};
-
-const onClick = (options: PickingOptions, event: MouseEvent): void => {
-  const hit = options.isActive() ? pickAt(options, event) : null;
-  if (hit === null) return;
-  hit.candidate.card.tiltTarget.set(0, 0);
-  options.onPick(hit.candidate.cardId);
-};
-
-export const attachPicking = (options: PickingOptions): Picking => {
-  const state: HoverState = { hovered: null };
+export const attachPicking = (options: PickingOptions): (() => void) => {
   const { canvas } = options;
   const move = (event: PointerEvent): void => {
-    onPointerMove(options, state, event);
+    options.onMove(pickAt(options, event), event);
   };
-  const release = (): void => {
-    hover(state, null);
-    canvas.style.cursor = '';
+  const leave = (event: PointerEvent): void => {
+    options.onMove(null, event);
   };
   const click = (event: MouseEvent): void => {
-    onClick(options, event);
+    const hit = pickAt(options, event);
+    if (hit !== null) options.onSelect(hit);
   };
   canvas.addEventListener('pointermove', move);
-  canvas.addEventListener('pointerleave', release);
+  canvas.addEventListener('pointerleave', leave);
   canvas.addEventListener('click', click);
-  const detach = (): void => {
+  return () => {
     canvas.removeEventListener('pointermove', move);
-    canvas.removeEventListener('pointerleave', release);
+    canvas.removeEventListener('pointerleave', leave);
     canvas.removeEventListener('click', click);
   };
-  return { release, detach };
 };

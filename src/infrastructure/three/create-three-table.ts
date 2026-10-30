@@ -1,5 +1,6 @@
 import type { CardId } from '@domain/cards/card';
 
+import type { TableListener } from '@application/ports/table-listener';
 import type { TablePort } from '@application/ports/table-port';
 import type { GameStore } from '@application/store/game-store';
 
@@ -11,13 +12,16 @@ import { assembleStage } from '@infrastructure/three/assemble-stage';
 import { createRenderer } from '@infrastructure/three/scene/renderer';
 import { startStage } from '@infrastructure/three/start-stage';
 import { createTableAdapter } from '@infrastructure/three/table/table-adapter';
+import type { TableSounds } from '@infrastructure/three/table/table-sounds';
 
 export interface ThreeTableOptions {
   readonly canvas: HTMLCanvasElement;
   readonly store: GameStore;
   readonly onPickCard: (cardId: CardId) => void;
+  readonly listener: TableListener;
   readonly reducedMotion: boolean;
   readonly onProgress: ProgressListener;
+  readonly sounds: TableSounds;
 }
 
 export interface ThreeTable {

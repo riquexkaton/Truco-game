@@ -12,6 +12,7 @@ import { showCardFace, tableCardOf } from '@infrastructure/three/cards/table-dec
 import type { HandSlot } from '@infrastructure/three/layout/hand-poses';
 import { CARD_Y, FACE_UP, VIRA_POINT } from '@infrastructure/three/layout/table-points';
 import type { Stage } from '@infrastructure/three/stage';
+import { refreshSealMarks } from '@infrastructure/three/table/seal-marking';
 import { deckPose, glide, handPose } from '@infrastructure/three/table/stage-motion';
 
 interface DealtCard {
@@ -53,11 +54,16 @@ const stackDealtCards = (stage: Stage, deal: RoundDeal): void => {
   stage.shadowsDirty = true;
 };
 
-const dealCard = async (stage: Stage, dealt: DealtCard): Promise<void> => {
-  void glide(stage, tableCardOf(stage.deck, dealt.cardId), {
+const landInHand = async (stage: Stage, dealt: DealtCard): Promise<void> => {
+  await glide(stage, tableCardOf(stage.deck, dealt.cardId), {
     pose: handPose(stage, dealt.side, dealt.slot),
     ...DEAL_MOTION[dealt.side],
   });
+  stage.sounds.play('cardDealt');
+};
+
+const dealCard = async (stage: Stage, dealt: DealtCard): Promise<void> => {
+  void landInHand(stage, dealt);
   await stage.scheduler.wait(DEAL_STAGGER_MS[dealt.side]);
 };
 
@@ -83,6 +89,7 @@ export const dealRound = async (stage: Stage, deal: RoundDeal): Promise<void> =>
   stage.hands.player = [...deal.player];
   stage.hands.rival = [...deal.rival];
   stackDealtCards(stage, deal);
+  refreshSealMarks(stage);
   await dealToHands(stage, deal);
   stage.art.prefetchRest();
 };

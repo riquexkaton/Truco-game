@@ -10,11 +10,13 @@ import { clearTable } from '@infrastructure/three/table/clear-table';
 import { dealRound } from '@infrastructure/three/table/deal-round';
 import { flyEffect } from '@infrastructure/three/table/effect-flight';
 import { placeOnTable } from '@infrastructure/three/table/place-card';
+import { refreshSealMarks } from '@infrastructure/three/table/seal-marking';
 import { arrangeSide, calmHands } from '@infrastructure/three/table/stage-motion';
 
 const arrangeHands = async (stage: Stage, hands: PerSide<readonly CardId[]>): Promise<void> => {
   stage.hands.player = [...hands.player];
   stage.hands.rival = [...hands.rival];
+  refreshSealMarks(stage);
   calmHands(stage);
   await Promise.all([arrangeSide(stage, 'player'), arrangeSide(stage, 'rival')]);
 };

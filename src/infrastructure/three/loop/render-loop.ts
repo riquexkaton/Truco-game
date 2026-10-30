@@ -5,6 +5,7 @@ import type { GlowFrame } from '@infrastructure/three/cards/duel-glows';
 import { updateGlows } from '@infrastructure/three/cards/duel-glows';
 import type { TableCard } from '@infrastructure/three/cards/table-card';
 import { areCoinsFlying, updateCoinFlights } from '@infrastructure/three/coins/coin-flights';
+import { trackSealHover } from '@infrastructure/three/interaction/seal-hover';
 import { setBackgroundFlicker } from '@infrastructure/three/scene/background';
 import { flickerCandles } from '@infrastructure/three/scene/candles';
 import { backgroundFlicker } from '@infrastructure/three/scene/pulses';
@@ -31,6 +32,7 @@ const animate = (stage: Stage, frame: GlowFrame): void => {
   for (const card of cards) {
     updateCard(card, frame.deltaSeconds);
   }
+  trackSealHover(stage);
 };
 
 const render = (stage: Stage): void => {

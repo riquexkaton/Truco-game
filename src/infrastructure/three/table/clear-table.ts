@@ -1,4 +1,5 @@
 import { clearCurseMarks } from '@infrastructure/three/cards/curse-marks';
+import { hideSealMarks } from '@infrastructure/three/cards/seal-marks';
 import type { TableCard } from '@infrastructure/three/cards/table-card';
 import { tableCardOf } from '@infrastructure/three/cards/table-deck';
 import type { Stage } from '@infrastructure/three/stage';
@@ -7,7 +8,8 @@ import { deckPose, glide } from '@infrastructure/three/table/stage-motion';
 const CLEAR_STAGGER_MS = 40;
 
 const cardsOnTable = (stage: Stage): TableCard[] => {
-  const ids = [...stage.played, ...stage.hands.player, ...stage.hands.rival];
+  const played = stage.played.map(({ cardId }) => cardId);
+  const ids = [...played, ...stage.hands.player, ...stage.hands.rival];
   const cards = ids.map((cardId) => tableCardOf(stage.deck, cardId));
   return stage.vira === null ? cards : [...cards, stage.deck.viras[stage.vira]];
 };
@@ -25,8 +27,11 @@ const forgetTable = (stage: Stage): void => {
 };
 
 export const clearTable = async (stage: Stage): Promise<void> => {
+  stage.listener.tableCleared();
   clearCurseMarks(stage.marks);
+  hideSealMarks(stage.seals);
   const cards = cardsOnTable(stage);
+  if (cards.length > 0) stage.sounds.play('tableCleared');
   stage.isClearing = true;
   await Promise.all(cards.map((card, order) => sendToDeck(stage, card, order)));
   for (const card of cards) {

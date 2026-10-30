@@ -1,6 +1,7 @@
 import type { Material, Object3D } from 'three';
 import { InstancedMesh, Mesh, Sprite, Texture } from 'three';
 
+import { disposeSealMarks } from '@infrastructure/three/cards/seal-marks';
 import type { Stage } from '@infrastructure/three/stage';
 
 const texturesOf = (material: Material): Texture[] =>
@@ -38,6 +39,7 @@ export const disposeStage = (stage: Stage): void => {
   for (const texture of [...stage.deck.faces.values(), ...Object.values(stage.backgrounds)]) {
     texture?.dispose();
   }
+  disposeSealMarks(stage.seals);
   stage.environment.dispose();
   stage.renderer.dispose();
 };

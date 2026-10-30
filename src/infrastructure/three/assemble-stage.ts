@@ -1,6 +1,7 @@
 import type { WebGLRenderer } from 'three';
 import { PerspectiveCamera, PlaneGeometry, Scene } from 'three';
 
+import type { TableListener } from '@application/ports/table-listener';
 import type { GameStore } from '@application/store/game-store';
 
 import { createCardArtLibrary } from '@infrastructure/browser/card-art-library';
@@ -10,9 +11,11 @@ import type { StageAssets } from '@infrastructure/three/assets/stage-assets';
 import { loadStageAssets } from '@infrastructure/three/assets/stage-assets';
 import { addDeckBoxes } from '@infrastructure/three/cards/deck-boxes';
 import { createDuelGlows } from '@infrastructure/three/cards/duel-glows';
+import { createSealMarks } from '@infrastructure/three/cards/seal-marks';
 import { createTableDeck } from '@infrastructure/three/cards/table-deck';
 import { resetCoins } from '@infrastructure/three/coins/coin-actions';
 import { createCoinTable } from '@infrastructure/three/coins/coin-table';
+import { createSealTrack } from '@infrastructure/three/interaction/seal-track';
 import type { Layout } from '@infrastructure/three/layout/layouts';
 import { layoutFor } from '@infrastructure/three/layout/layouts';
 import { CARD_HEIGHT, CARD_WIDTH } from '@infrastructure/three/layout/table-points';
@@ -20,11 +23,14 @@ import { createBackground } from '@infrastructure/three/scene/background';
 import { createCandles } from '@infrastructure/three/scene/candles';
 import { addRoomLights } from '@infrastructure/three/scene/room-lights';
 import type { Stage, StagePieces, StageView } from '@infrastructure/three/stage';
+import type { TableSounds } from '@infrastructure/three/table/table-sounds';
 
 export interface StageOptions {
   readonly store: GameStore;
   readonly reducedMotion: boolean;
   readonly progress: LoadProgress;
+  readonly sounds: TableSounds;
+  readonly listener: TableListener;
 }
 
 const screenLayout = (): Layout => layoutFor(globalThis.innerWidth / globalThis.innerHeight);
@@ -57,9 +63,13 @@ const buildPieces = (view: StageView, assets: StageAssets, options: StageOptions
     sparkTexture: radial.halo,
     reducedMotion: options.reducedMotion,
     layout: screenLayout().key,
+    onCoinLand: () => {
+      options.sounds.play('coinLanded');
+    },
   });
   resetCoins(coins);
-  return { glows: createDuelGlows(scene, radial.glow), deck, coins, marks: [] };
+  const glows = createDuelGlows(scene, radial.glow);
+  return { glows, deck, coins, marks: [], seals: createSealMarks(kit) };
 };
 
 export const assembleStage = async (
@@ -75,8 +85,11 @@ export const assembleStage = async (
     scheduler: createBrowserScheduler({ reducedMotion: options.reducedMotion }),
     art: createCardArtLibrary(),
     store: options.store,
+    sounds: options.sounds,
+    listener: options.listener,
     hands: { player: [], rival: [] },
     played: [],
+    sealTrack: createSealTrack(),
     vira: null,
     layout: screenLayout(),
     isClearing: false,

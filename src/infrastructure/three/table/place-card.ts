@@ -10,6 +10,7 @@ import { addCurseMark } from '@infrastructure/three/cards/curse-marks';
 import { tableCardOf } from '@infrastructure/three/cards/table-deck';
 import { CARD_Y, FACE_UP, slotPoint } from '@infrastructure/three/layout/table-points';
 import type { Stage } from '@infrastructure/three/stage';
+import { refreshSealMarks } from '@infrastructure/three/table/seal-marking';
 import { arrangeSide, glide } from '@infrastructure/three/table/stage-motion';
 
 const PLACE_MOTION: PerSide<{ readonly duration: number; readonly rz: number }> = {
@@ -29,7 +30,8 @@ export const placeOnTable = async (stage: Stage, placement: CardPlacement): Prom
   const { side, cardId, duel } = placement;
   const card = tableCardOf(stage.deck, cardId);
   removeCard(stage.hands[side], cardId);
-  stage.played.push(cardId);
+  stage.played.push({ side, cardId, duel });
+  refreshSealMarks(stage);
   calmCard(card);
   void arrangeSide(stage, side);
   const slot = slotPoint(side, duel);
@@ -42,5 +44,6 @@ export const placeOnTable = async (stage: Stage, placement: CardPlacement): Prom
     duration: PLACE_MOTION[side].duration,
     lift: PLACE_LIFT,
   });
+  stage.sounds.play('cardPlaced');
   if (placement.cursed) addCurseMark(stage.scene, stage.marks, slot);
 };
