@@ -1,7 +1,7 @@
 import {
   acceptedChallenge,
   declineDamage,
-  FOLD_DAMAGE,
+  foldDamage,
   nextLevel,
   STAKES,
 } from '@domain/challenge/challenge';
@@ -22,7 +22,7 @@ export const retire = (state: MatchState, { side, damage }: Retirement): MatchSt
   );
 
 export const fold = (state: MatchState, side: Side): MatchState =>
-  retire(state, { side, damage: FOLD_DAMAGE });
+  retire(state, { side, damage: foldDamage(state.challenge) });
 
 export const acceptChallenge = (state: MatchState, acceptor: Side): MatchState => {
   const challenge = acceptedChallenge(state.challenge, acceptor);

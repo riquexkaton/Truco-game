@@ -4,6 +4,7 @@ import {
   acceptedChallenge,
   canRaise,
   declineDamage,
+  foldDamage,
   nextLevel,
   NO_CHALLENGE,
   STAKES,
@@ -37,5 +38,11 @@ describe('challenge levels', () => {
   it('charges 1 for declining a Desafío and 4 for declining a Contra', () => {
     expect(declineDamage(1)).toBe(1);
     expect(declineDamage(2)).toBe(4);
+  });
+
+  it('charges 1 for folding an unchallenged round and what it is worth otherwise', () => {
+    expect(foldDamage(NO_CHALLENGE)).toBe(1);
+    expect(foldDamage({ level: 1, holder: 'rival' })).toBe(4);
+    expect(foldDamage({ level: 2, holder: null })).toBe(6);
   });
 });

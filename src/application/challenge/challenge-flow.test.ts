@@ -97,7 +97,21 @@ describe('Me voy', () => {
     harness.hud.script('foldConfirm', false);
     harness.commands.fold();
     await harness.untilIdle();
+    expect(harness.hud.questions).toEqual([{ kind: 'foldConfirm', damage: 1 }]);
     expect(harness.store.canFold.value).toBe(true);
     expect(harness.store.lives.value.player).toBe(20);
+  });
+
+  it('costs what the accepted Desafío made the round worth', async () => {
+    const harness = await startedHarness({ round: PLAYER_LEADS });
+    harness.commands.callChallenge();
+    await harness.untilIdle();
+    harness.hud.script('foldConfirm', true);
+    harness.commands.fold();
+    await harness.until(() => harness.store.lives.value.player === 16);
+    expect(harness.hud.questions).toEqual([{ kind: 'foldConfirm', damage: 4 }]);
+    expect(harness.hud.eventsOf('retired')).toEqual([
+      { type: 'retired', side: 'player', damage: 4, reason: 'fold' },
+    ]);
   });
 });

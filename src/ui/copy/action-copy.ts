@@ -15,7 +15,8 @@ export interface PactState {
 
 export const FOLD_COPY = {
   label: 'ME VOY',
-  description: 'Me voy: abandonas la ronda y pierdes 1 de vida',
+  description: (damage: number): string =>
+    `Me voy: abandonas la ronda y pierdes ${num(damage)} de vida`,
 };
 
 export const CANTAR_COPY = {

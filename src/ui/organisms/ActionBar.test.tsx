@@ -15,6 +15,7 @@ const action = (copy: MenuItemCopy, isEnabled: boolean, isVisible = true): MenuA
 
 const modelWith = (overrides: Partial<ActionBarModel> = {}): ActionBarModel => ({
   canFold: true,
+  foldDamage: 1,
   isTurn: true,
   challenge: action(challengeItemCopy({ level: 0, holder: null, stake: 2 }), true),
   pact: action(pactItemCopy({ ritualSung: false, pendingAmount: null }), true),
@@ -57,6 +58,13 @@ describe('the action bar', () => {
       }).disabled,
     ).toBe(true);
     expect(cantar().hasAttribute('disabled')).toBe(true);
+  });
+
+  it('tells what folding costs once the round is raised', () => {
+    mount(modelWith({ foldDamage: 6 }));
+    expect(
+      screen.getByRole('button', { name: 'Me voy: abandonas la ronda y pierdes 6 de vida' }),
+    ).toBeTruthy();
   });
 
   it('opens the Cantar menu and reflects it in aria-expanded', () => {

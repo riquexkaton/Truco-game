@@ -1,4 +1,4 @@
-import { STAKES } from '@domain/challenge/challenge';
+import { foldDamage, STAKES } from '@domain/challenge/challenge';
 import type { MatchState } from '@domain/match/match-state';
 import { hasPlaced } from '@domain/match/queries';
 
@@ -20,6 +20,7 @@ export const actionBarModel = (store: GameStore): ActionBarModel => {
   const challenge = store.challenge.value;
   return {
     canFold: store.canFold.value,
+    foldDamage: foldDamage(challenge),
     isTurn: store.canFold.value,
     challenge: {
       copy: challengeItemCopy(challenge),

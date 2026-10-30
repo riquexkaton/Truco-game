@@ -56,10 +56,21 @@ describe('Contra', () => {
 });
 
 describe('retiring', () => {
-  it('folds for 1 whatever the round was worth', () => {
-    const state = fold(matchFixture({ stake: 6, challenge: { level: 2, holder: null } }), 'player');
+  it('folds for 1 when no challenge was accepted', () => {
+    const state = fold(matchFixture(), 'player');
     expect(state.lives.player).toBe(19);
     expect(state).toMatchObject({ roundOver: true, retired: true, roundWinner: 'rival' });
+  });
+
+  it('folds for 4 once a Desafío was accepted, even for the side that raised', () => {
+    const desafio = acceptChallenge(matchFixture(), 'rival');
+    expect(fold(desafio, 'player').lives.player).toBe(16);
+    expect(fold(desafio, 'rival').lives.rival).toBe(16);
+  });
+
+  it('folds for 6 once a Contra was accepted', () => {
+    const contra = acceptChallenge(acceptChallenge(matchFixture(), 'player'), 'rival');
+    expect(fold(contra, 'player')).toMatchObject({ lives: { player: 14, rival: 20 } });
   });
 
   it('ends the match when the damage is lethal', () => {

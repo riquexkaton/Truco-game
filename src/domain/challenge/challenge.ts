@@ -15,7 +15,7 @@ export const STAKES: Readonly<Record<ChallengeLevel, number>> = { 0: 2, 1: 4, 2:
 
 const MAX_CHALLENGE_LEVEL: ChallengeLevel = 2;
 
-export const FOLD_DAMAGE = 1;
+const FOLD_DAMAGE = 1;
 
 export const NO_CHALLENGE: Challenge = { level: 0, holder: null };
 
@@ -31,3 +31,6 @@ export const acceptedChallenge = (challenge: Challenge, acceptor: Side): Challen
 
 export const declineDamage = (level: RaisedLevel): number =>
   level === 1 ? FOLD_DAMAGE : STAKES[1];
+
+export const foldDamage = ({ level }: Challenge): number =>
+  level === 0 ? FOLD_DAMAGE : STAKES[level];

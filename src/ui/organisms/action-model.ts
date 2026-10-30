@@ -8,6 +8,7 @@ export interface MenuAction {
 
 export interface ActionBarModel {
   readonly canFold: boolean;
+  readonly foldDamage: number;
   readonly isTurn: boolean;
   readonly challenge: MenuAction;
   readonly pact: MenuAction;

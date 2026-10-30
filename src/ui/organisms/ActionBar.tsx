@@ -74,7 +74,11 @@ export const ActionBar = (props: ActionBarProps) => {
       class="fixed right-[max(22px,env(safe-area-inset-right,0px))] bottom-[calc(20px+env(safe-area-inset-bottom,0px))] flex items-end gap-4 narrow:right-3.5 narrow:gap-2.5"
     >
       <ActionColumn label={FOLD_COPY.label}>
-        <FoldButton isEnabled={model.canFold} onFold={closing(close, handlers.onFold)} />
+        <FoldButton
+          isEnabled={model.canFold}
+          damage={model.foldDamage}
+          onFold={closing(close, handlers.onFold)}
+        />
       </ActionColumn>
       <CantarColumn {...props} triggerRef={triggerRef} />
     </div>

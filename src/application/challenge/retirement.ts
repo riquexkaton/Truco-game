@@ -1,4 +1,4 @@
-import { FOLD_DAMAGE } from '@domain/challenge/challenge';
+import { foldDamage } from '@domain/challenge/challenge';
 import type { Retirement } from '@domain/match/challenge-flow';
 import { retire } from '@domain/match/challenge-flow';
 
@@ -20,6 +20,7 @@ export const retireFlow = async (game: GameContext, request: RetireRequest): Pro
 };
 
 export const foldFlow = async (game: GameContext): Promise<void> => {
-  const shouldFold = await ask(game, { kind: 'foldConfirm' });
-  if (shouldFold) await retireFlow(game, { side: 'player', damage: FOLD_DAMAGE, reason: 'fold' });
+  const damage = foldDamage(matchOf(game).challenge);
+  const shouldFold = await ask(game, { kind: 'foldConfirm', damage });
+  if (shouldFold) await retireFlow(game, { side: 'player', damage, reason: 'fold' });
 };

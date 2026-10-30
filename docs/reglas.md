@@ -119,7 +119,7 @@ Como en el truco, quien **acepta** un Desafío queda con la palabra:
 En su turno, un jugador puede decir **"Me voy"** (como irse al mazo en el truco):
 
 - Abandona la ronda: el rival la gana.
-- Quien se va recibe **1 de daño**, sin importar lo que valiera la ronda por un Desafío.
+- Quien se va pierde lo que vale la ronda, como en el truco: **4** si se aceptó un Desafío y **6** si se aceptó un contra-desafío. Sin Desafío aceptado, recibe **1 de daño**. Vale igual para quien subió la apuesta.
 - Si había un Pacto aceptado, se sigue revelando al final de la ronda y su daño se aplica igual.
 
 ---
@@ -270,7 +270,7 @@ El juego se enseña jugando, sin manual: como en Overcooked, cada etapa de la ca
 | La mano de 3 cartas                     | Ronda                                                        |
 | Truco / retruco                         | Desafío / Contra-desafío                                     |
 | No quiero                               | Retirarse                                                    |
-| Irse al mazo                            | Me voy (−1 de vida)                                          |
+| Irse al mazo                            | Me voy (−1 de vida, o lo que vale la ronda si hay Desafío)   |
 | Envido / real envido / falta envido     | Pacto / Re-pacto / Apuesta (figuras valen 0, +20 por pareja) |
 | Flor                                    | Ritual (hay que cantarlo)                                    |
 | Vira (una de las 40 cartas)             | Vira (mazo aparte, una por facción)                          |
