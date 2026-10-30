@@ -11,7 +11,12 @@ const isPicking = (actions: readonly AnswerAction[]): boolean =>
 
 export const AnswerRow = ({ actions, layout }: AnswerRowProps) => {
   const buttons = actions.map((action, index) => (
-    <AnswerButton key={action.name} action={action} index={index} layout={layout} />
+    <AnswerButton
+      key={`${String(index)}-${action.name}`}
+      action={action}
+      index={index}
+      layout={layout}
+    />
   ));
   if (isPicking(actions)) {
     return <div class="flex justify-center gap-3">{buttons}</div>;
