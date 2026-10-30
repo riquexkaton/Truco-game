@@ -24,6 +24,7 @@ export const flyEffect = async (stage: Stage, side: Side): Promise<void> => {
     rx: FACE_DOWN,
     rz: 0,
   });
+  stage.sounds.play('effectTaken');
   await glide(stage, card, {
     pose: { position: flightTarget(stage, side), rx: FACE_DOWN, rz: 0.3 },
     duration: 0.6,

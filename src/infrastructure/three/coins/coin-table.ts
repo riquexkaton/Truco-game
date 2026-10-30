@@ -49,6 +49,7 @@ export interface CoinTable {
   readonly blobMaterial: MeshBasicMaterial;
   readonly sparkTexture: Texture;
   readonly reducedMotion: boolean;
+  readonly onCoinLand: () => void;
 }
 
 export interface CoinTableOptions {
@@ -58,6 +59,7 @@ export interface CoinTableOptions {
   readonly sparkTexture: Texture;
   readonly reducedMotion: boolean;
   readonly layout: LayoutKey;
+  readonly onCoinLand: () => void;
 }
 
 const emptyPile = (side: Side, layout: LayoutKey): CoinPile => ({
@@ -86,4 +88,5 @@ export const createCoinTable = (options: CoinTableOptions): CoinTable => ({
   }),
   sparkTexture: options.sparkTexture,
   reducedMotion: options.reducedMotion,
+  onCoinLand: options.onCoinLand,
 });

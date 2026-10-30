@@ -19,6 +19,8 @@ export const MENU_COPY = {
   soon: 'PRÓXIMAMENTE',
   fullscreen: 'Pantalla completa',
   exitFullscreen: 'Salir de pantalla completa',
+  music: 'Música',
+  sfx: 'Efectos de sonido',
 };
 
 export const TITLE_CARDS: readonly TitleCardCopy[] = [

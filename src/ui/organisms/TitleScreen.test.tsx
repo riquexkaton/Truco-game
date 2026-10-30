@@ -3,11 +3,21 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TitleScreen } from '@ui/organisms/TitleScreen';
 
-const mount = () => {
+const mount = (isMusicEnabled = true, isSfxEnabled = true) => {
   const onIntent = vi.fn();
   const onStart = vi.fn();
-  render(<TitleScreen onIntent={onIntent} onStart={onStart} />);
-  return { onIntent, onStart, play: screen.getByRole('button', { name: 'JUGAR' }) };
+  const onToggle = vi.fn();
+  const onSfxToggle = vi.fn();
+  render(
+    <TitleScreen
+      music={{ isEnabled: isMusicEnabled, onToggle }}
+      sfx={{ isEnabled: isSfxEnabled, onToggle: onSfxToggle }}
+      onIntent={onIntent}
+      onStart={onStart}
+    />,
+  );
+  const play = screen.getByRole('button', { name: 'JUGAR' });
+  return { onIntent, onStart, onToggle, onSfxToggle, play };
 };
 
 const FULLSCREEN_KEYS = ['fullscreenEnabled', 'fullscreenElement', 'exitFullscreen'];
@@ -93,6 +103,34 @@ describe('the title screen', () => {
   it('hides the fullscreen toggle when the browser cannot go fullscreen', () => {
     mount();
     expect(screen.queryByRole('button', { name: 'Pantalla completa' })).toBeNull();
+  });
+
+  it.each([
+    [true, 'true'],
+    [false, 'false'],
+  ])('shows the music toggle as pressed=%s in the header', (isMusicEnabled, pressed) => {
+    mount(isMusicEnabled);
+    const toggle = screen.getByRole('button', { name: 'Música' });
+    expect(toggle.getAttribute('aria-pressed')).toBe(pressed);
+    expect(toggle.closest('header')).toBeTruthy();
+  });
+
+  it('asks to toggle the music from the header', () => {
+    const { onToggle, onSfxToggle, onStart } = mount();
+    fireEvent.click(screen.getByRole('button', { name: 'Música' }));
+    expect(onToggle).toHaveBeenCalledOnce();
+    expect(onSfxToggle).not.toHaveBeenCalled();
+    expect(onStart).not.toHaveBeenCalled();
+  });
+
+  it('offers a separate sound effects toggle beside the music one', () => {
+    const { onToggle, onSfxToggle } = mount(true, false);
+    const toggle = screen.getByRole('button', { name: 'Efectos de sonido' });
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    expect(toggle.closest('header')).toBeTruthy();
+    fireEvent.click(toggle);
+    expect(onSfxToggle).toHaveBeenCalledOnce();
+    expect(onToggle).not.toHaveBeenCalled();
   });
 
   it('toggles fullscreen from the header', async () => {

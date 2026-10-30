@@ -1,5 +1,4 @@
 import type { Mesh, Vector3 } from 'three';
-import { AdditiveBlending, Sprite, SpriteMaterial } from 'three';
 
 import type { FlightSample } from '@infrastructure/three/coins/coin-flight-math';
 import {
@@ -8,6 +7,7 @@ import {
   flightSeconds,
   sampleFlight,
 } from '@infrastructure/three/coins/coin-flight-math';
+import { removeSpark, showLanding } from '@infrastructure/three/coins/coin-landing';
 import type { CoinFlight, CoinTable } from '@infrastructure/three/coins/coin-table';
 import { lerp } from '@infrastructure/three/cards/tween-math';
 
@@ -21,13 +21,6 @@ export interface FlightPlan {
   readonly seconds: number;
   readonly onLand: (() => void) | null;
 }
-
-const SPARK_SIZE = 0.35;
-
-const removeSpark = (flight: CoinFlight): void => {
-  flight.spark?.removeFromParent();
-  flight.spark?.material.dispose();
-};
 
 const removeFlight = (table: CoinTable, flight: CoinFlight): void => {
   removeSpark(flight);
@@ -50,23 +43,6 @@ export const launchFlight = (table: CoinTable, plan: FlightPlan): void => {
     progress: -plan.order * COIN_STAGGER_SECONDS,
     spark: null,
   });
-};
-
-const showSpark = (table: CoinTable, flight: CoinFlight, opacity: number): void => {
-  if (flight.spark === null) {
-    const material = new SpriteMaterial({
-      map: table.sparkTexture,
-      blending: AdditiveBlending,
-      depthWrite: false,
-      transparent: true,
-      opacity: 0,
-    });
-    flight.spark = new Sprite(material);
-    flight.spark.position.copy(flight.to);
-    flight.spark.scale.set(SPARK_SIZE, SPARK_SIZE, 1);
-    table.scene.add(flight.spark);
-  }
-  flight.spark.material.opacity = opacity;
 };
 
 const poseCoin = (table: CoinTable, flight: CoinFlight, sample: FlightSample): void => {
@@ -92,7 +68,7 @@ const stepFlight = (table: CoinTable, flight: CoinFlight, deltaSeconds: number):
   if (flight.progress < 0) return;
   const sample = sampleFlight(flight.progress, flight.apex);
   poseCoin(table, flight, sample);
-  if (sample.landed) showSpark(table, flight, sample.spark);
+  if (sample.landed) showLanding(table, flight, sample.spark);
   if (flight.progress >= 1) land(table, flight);
 };
 
