@@ -47,17 +47,16 @@ describe('the turn timer', () => {
     expect(hud.eventsOf('turnTimedOut')).toHaveLength(1);
   });
 
-  it('pauses while an announcement is still on screen', async () => {
+  it('keeps running while a notice waits to be shown', async () => {
     const { clock, store, hud } = await startedHarness({ round: HAND }, (fake) => {
       fake.holdEvent('turnStarted');
     });
-    await clock.advance(30_000);
-    expect(store.turnSecondsLeft.value).toBe(20);
-    expect(store.isTurnPaused.value).toBe(true);
-    hud.releaseEvent('turnStarted');
     await clock.advance(5000);
     expect(store.isTurnPaused.value).toBe(false);
     expect(store.turnSecondsLeft.value).toBe(15);
+    hud.releaseEvent('turnStarted');
+    await clock.advance(5000);
+    expect(store.turnSecondsLeft.value).toBe(10);
   });
 
   it('restarts at 20 seconds on the next turn', async () => {

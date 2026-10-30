@@ -13,9 +13,6 @@ const isPlainKey = (event: KeyboardEvent): boolean =>
 export const answerIndexFor = (event: KeyboardEvent): number =>
   isPlainKey(event) && /^[1-9]$/.test(event.key) ? Number(event.key) - 1 : -1;
 
-export const isContinueKey = (event: KeyboardEvent): boolean =>
-  isPlainKey(event) && (event.key === ' ' || event.key === 'Enter');
-
 export const useCapturedKey = (pick: KeyPick): void => {
   useLayoutEffect(() => {
     const onKey = (event: KeyboardEvent) => {

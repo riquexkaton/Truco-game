@@ -12,7 +12,6 @@ export interface GameSignals {
   readonly phase: Signal<Phase>;
   readonly busy: Signal<boolean>;
   readonly prompting: Signal<boolean>;
-  readonly announcing: Signal<number>;
   readonly turnSecondsLeft: Signal<number>;
   readonly showPlayHint: Signal<boolean>;
 }
@@ -22,7 +21,6 @@ export const createSignals = (): GameSignals => ({
   phase: signal<Phase>('idle'),
   busy: signal(true),
   prompting: signal(false),
-  announcing: signal(0),
   turnSecondsLeft: signal(TURN_SECONDS),
   showPlayHint: signal(true),
 });

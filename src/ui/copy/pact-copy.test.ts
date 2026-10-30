@@ -6,6 +6,8 @@ import { noticeFor } from '@ui/copy/event-copy';
 
 const headline = (fields: object) => ({ kind: 'headline', headline: fields });
 
+const rivalMark = (fields: object) => mark({ ...fields, isRival: true });
+
 const mark = (fields: object) => ({ kind: 'mark', mark: fields });
 
 const CHALLENGE_CASES: [string, GameEvent, object][] = [
@@ -22,13 +24,10 @@ const CHALLENGE_CASES: [string, GameEvent, object][] = [
   [
     'challengeAccepted by the rival',
     { type: 'challengeAccepted', by: 'rival', stake: 6, holder: null },
-    headline({
-      isRival: true,
-      seal: '6',
-      tone: 'lose',
-      title: 'EL RIVAL ACEPTA',
-      result: 'LA RONDA VALE 6',
-    }),
+    {
+      ...rivalMark({ title: 'EL RIVAL ACEPTA', detail: 'La ronda vale 6.', tone: 'lose' }),
+      announcement: 'EL RIVAL ACEPTA. La ronda vale 6.',
+    },
   ],
 ];
 
@@ -55,14 +54,7 @@ const PACT_CASES: [string, GameEvent, object][] = [
   [
     'pactRejected by the rival',
     { type: 'pactRejected', by: 'rival', damage: 2 },
-    headline({
-      isRival: true,
-      seal: '−2',
-      tone: 'win',
-      title: 'NO QUISO',
-      body: 'El rival rechazó tu Pacto.',
-      result: 'EL RIVAL PIERDE 2',
-    }),
+    rivalMark({ title: 'NO QUISO', detail: 'El rival pierde 2.', tone: 'win' }),
   ],
   [
     'pactRejected by the player',
@@ -72,22 +64,10 @@ const PACT_CASES: [string, GameEvent, object][] = [
   [
     'pactAccepted by the rival',
     { type: 'pactAccepted', by: 'rival', amount: 4 },
-    headline({ title: 'EL RIVAL QUISO', result: 'EN JUEGO · VALE 4' }),
-  ],
-  [
-    'pactAnnulled by the player',
-    { type: 'pactAnnulled', by: 'player' },
-    mark({ title: 'PACTO ANULADO', detail: 'Respondes con Ritual: el Pacto no cuenta.' }),
-  ],
-  [
-    'pactAnnulled by the rival',
-    { type: 'pactAnnulled', by: 'rival' },
-    headline({
-      isRival: true,
-      seal: '×',
-      title: 'PACTO ANULADO',
-      body: 'El rival responde con Ritual.',
-      result: 'NADIE RECIBE DAÑO',
+    rivalMark({
+      title: 'EL RIVAL QUISO',
+      detail: 'El Pacto vale 4: se revela al final de la ronda.',
+      tone: 'ink',
     }),
   ],
   [
@@ -118,25 +98,39 @@ const EFFECT_CASES: [string, GameEvent, object][] = [
   [
     'effectUsed by the player',
     { type: 'effectUsed', side: 'player', effect: 'golpe' },
-    { kind: 'reveal', side: 'player', effect: 'golpe', announcement: 'Usas GOLPE' },
+    {
+      kind: 'reveal',
+      side: 'player',
+      effect: 'golpe',
+      line: '2 de daño al campeón rival.',
+      announcement: 'Usas GOLPE',
+    },
   ],
   [
     'effectUsed by the rival',
     { type: 'effectUsed', side: 'rival', effect: 'golpe' },
     {
-      ...headline({
-        isRival: true,
-        effect: 'golpe',
-        title: 'GOLPE',
-        body: 'El rival te golpea: recibes 2 de daño.',
-      }),
-      announcement: 'GOLPE. El rival te golpea: recibes 2 de daño.',
+      kind: 'reveal',
+      side: 'rival',
+      effect: 'golpe',
+      line: 'El rival te golpea: recibes 2 de daño.',
+      announcement: 'El rival usa GOLPE. El rival te golpea: recibes 2 de daño.',
     },
   ],
   [
-    'effectAnnulled',
+    'the player’s effect annulled',
     { type: 'effectAnnulled', side: 'player' },
-    headline({ isRival: true, seal: '×', title: 'TU EFECTO, ANULADO' }),
+    { kind: 'annul', side: 'player', line: 'El Sello del rival lo anula.' },
+  ],
+  [
+    'the rival’s effect annulled',
+    { type: 'effectAnnulled', side: 'rival' },
+    {
+      kind: 'annul',
+      side: 'rival',
+      line: 'Tu Sello lo anula.',
+      announcement: 'ANULADO. Tu Sello lo anula.',
+    },
   ],
   [
     'plundered',

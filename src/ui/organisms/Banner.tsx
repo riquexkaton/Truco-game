@@ -38,7 +38,7 @@ export const Banner = ({ banner }: BannerProps) =>
       key={banner.id}
       aria-hidden="true"
       style={{ animationDuration: `${String(banner.duration)}ms` }}
-      class="paper-rule pointer-events-none fixed top-[40%] left-1/2 flex min-h-[124px] w-[min(620px,calc(100vw-32px))] [transform:translate(-50%,-50%)] animate-banner-in flex-col items-center justify-center gap-2.5 bg-washi px-[86px] py-6 text-ink opacity-0 shadow-[0_24px_50px_rgb(0_0_0/0.65)] [--rule-inset:9px] narrow:min-h-[108px] narrow:px-14 narrow:py-5 tall:top-[calc(126px+env(safe-area-inset-top,0px))]"
+      class="paper-rule pointer-events-none fixed top-[40%] left-1/2 z-7 flex min-h-[124px] w-[min(620px,calc(100vw-32px))] [transform:translate(-50%,-50%)] animate-banner-in flex-col items-center justify-center gap-2.5 bg-washi px-[86px] py-6 text-ink opacity-0 shadow-[0_24px_50px_rgb(0_0_0/0.65)] [--rule-inset:9px] narrow:min-h-[108px] narrow:px-14 narrow:py-5 tall:top-[calc(126px+env(safe-area-inset-top,0px))]"
     >
       <i class={`${END} left-[10.5px] border-r-[1.5px] border-ink ${ENDS[banner.kind]}`} />
       <i class={`${END} right-[10.5px] border-l-[1.5px] border-ink ${ENDS[banner.kind]}`} />

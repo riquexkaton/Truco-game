@@ -20,7 +20,7 @@ const startCountdown = (signals: HudSignals, timeout: Timeout<unknown>, finish: 
   }, PROMPT_TICK_MS);
 };
 
-export const createPromptSession = (signals: HudSignals): AskPrompt => {
+export const createPromptSession = (signals: HudSignals, clearNotices: () => void): AskPrompt => {
   let asked = 0;
   return (spec) =>
     new Promise((resolve) => {
@@ -35,6 +35,7 @@ export const createPromptSession = (signals: HudSignals): AskPrompt => {
         resolve(answer);
       };
       asked += 1;
+      clearNotices();
       signals.prompt.value = { id: asked, spec, choose: finish };
       signals.announcement.value = promptAnnouncement(spec);
       if (spec.timeout !== null) countdown = startCountdown(signals, spec.timeout, finish);

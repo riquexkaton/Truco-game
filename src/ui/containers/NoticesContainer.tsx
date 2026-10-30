@@ -44,7 +44,7 @@ export const NoticesContainer = ({ session }: ContainerProps) => {
       <Mark mark={hud.mark.value} />
       <TableCloseUps session={session} />
       <RevealCard reveal={hud.reveal.value} />
-      <Headline headline={hud.headline.value} onContinue={hud.dismissHeadline} />
+      <Headline headline={hud.headline.value} onClose={hud.dismissHeadline} />
       <PromptCard prompt={hud.prompt.value} timer={hud.promptTimer.value} />
       <Hint
         text={isGiving ? HINT_COPY.give : HINT_COPY.play}

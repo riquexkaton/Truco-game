@@ -17,7 +17,7 @@ export const playerTurn = async (game: GameContext): Promise<void> => {
     replaceMatch(game, startTurn(matchOf(game)));
   });
   void runTurnTimer(game, turn);
-  await announce(game, { type: 'turnStarted', side: 'player' });
+  void announce(game, { type: 'turnStarted', side: 'player' });
   await turn.promise;
   game.signals.phase.value = 'wait';
 };

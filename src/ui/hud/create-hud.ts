@@ -3,15 +3,14 @@ import type { TableListener } from '@application/ports/table-listener';
 
 import { noticeFor } from '@ui/copy/event-copy';
 import { promptFor } from '@ui/copy/question-copy';
-import { createBannerQueue } from '@ui/hud/banner-queue';
-import { createHeadlineQueue } from '@ui/hud/headline-queue';
-import { hudTiming } from '@ui/hud/hud-timing';
-import type { HudView } from '@ui/hud/hud-view';
+import { hudTiming, NOTICE_MIN_MS } from '@ui/hud/hud-timing';
+import type { HudSignals, HudView } from '@ui/hud/hud-view';
 import { createHudSignals } from '@ui/hud/hud-view';
 import { createNoticeHandlers, dispatchNotice } from '@ui/hud/notice-handlers';
+import { createNoticeQueue } from '@ui/hud/notice-queue';
 import { createPromptSession } from '@ui/hud/prompt-session';
-import { createStage } from '@ui/hud/stage';
 import { createTableWatch } from '@ui/hud/table-watch';
+import { createVoice } from '@ui/hud/voice';
 
 export interface HudOptions {
   readonly reducedMotion: boolean;
@@ -23,14 +22,24 @@ export interface Hud {
   readonly table: TableListener;
 }
 
+const createNotices = (signals: HudSignals, isReducedMotion: boolean) => {
+  const queue = createNoticeQueue(NOTICE_MIN_MS);
+  const clearNotices = () => {
+    queue.clear();
+    signals.headline.value = null;
+  };
+  const voice = createVoice(signals.announcement);
+  const timing = hudTiming(isReducedMotion);
+  return {
+    clearNotices,
+    handlers: createNoticeHandlers({ signals, timing, queue, voice, clearNotices }),
+  };
+};
+
 export const createHud = ({ reducedMotion }: HudOptions): Hud => {
   const signals = createHudSignals();
-  const timing = hudTiming(reducedMotion);
-  const stage = createStage();
-  const banner = createBannerQueue(signals, timing, stage);
-  const headlines = createHeadlineQueue(signals, timing, stage);
-  const handlers = createNoticeHandlers({ signals, timing }, { banner, headline: headlines.show });
-  const askPrompt = createPromptSession(signals);
+  const { handlers, clearNotices } = createNotices(signals, reducedMotion);
+  const askPrompt = createPromptSession(signals, clearNotices);
   const table = createTableWatch(signals.prompt);
   return {
     port: {
@@ -41,7 +50,9 @@ export const createHud = ({ reducedMotion }: HudOptions): Hud => {
     view: {
       ...signals,
       ...table.view,
-      dismissHeadline: headlines.dismiss,
+      dismissHeadline: () => {
+        signals.headline.value = null;
+      },
       closeGameOver: () => {
         signals.gameOver.value = null;
       },

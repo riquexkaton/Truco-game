@@ -1,36 +1,32 @@
 import type { Notice, NoticeKind, NoticeOf } from '@ui/copy/notice';
 import type { HudTiming } from '@ui/hud/hud-timing';
-import { delay, HIT_MS, REVEAL_EXIT_MS } from '@ui/hud/hud-timing';
+import { HIT_MS } from '@ui/hud/hud-timing';
 import type { HudSignals } from '@ui/hud/hud-view';
+import { QUEUE_ITEMS } from '@ui/hud/notice-items';
+import type { NoticeQueue } from '@ui/hud/notice-queue';
+import type { Voice } from '@ui/hud/voice';
 
 export type NoticeHandlers = {
   readonly [K in NoticeKind]: (notice: NoticeOf<K>) => Promise<void>;
 };
 
-interface NoticeOutlets {
+export interface NoticeOutlets {
   readonly signals: HudSignals;
   readonly timing: HudTiming;
+  readonly queue: NoticeQueue;
+  readonly voice: Voice;
+  readonly clearNotices: () => void;
 }
 
 const done = Promise.resolve();
 
-const revealEffect = async (
-  { signals, timing }: NoticeOutlets,
-  { side, effect, announcement }: NoticeOf<'reveal'>,
-  id: number,
-): Promise<void> => {
-  signals.reveal.value = { id, side, effect, shown: true };
-  signals.announcement.value = announcement;
-  await delay(timing.reveal);
-  signals.reveal.value = { id, side, effect, shown: false };
-  await delay(REVEAL_EXIT_MS);
-  signals.reveal.value = null;
-};
-
-const showLife = (signals: HudSignals, { side, delta, announcement }: NoticeOf<'life'>) => {
+const showLife = (
+  { signals, voice }: NoticeOutlets,
+  { side, delta, announcement }: NoticeOf<'life'>,
+) => {
   const id = (signals.lifeHits.peek()[side]?.id ?? 0) + 1;
   signals.lifeHits.value = { ...signals.lifeHits.value, [side]: { id, delta, hit: delta < 0 } };
-  signals.announcement.value = announcement;
+  voice.add(announcement);
   setTimeout(() => {
     const current = signals.lifeHits.value[side];
     if (current?.id !== id) return;
@@ -39,38 +35,49 @@ const showLife = (signals: HudSignals, { side, delta, announcement }: NoticeOf<'
   return done;
 };
 
-const showMark = ({ signals, timing }: NoticeOutlets, notice: NoticeOf<'mark'>, id: number) => {
-  signals.mark.value = { ...notice.mark, id };
-  signals.announcement.value = notice.announcement;
-  setTimeout(() => {
-    if (signals.mark.peek()?.id === id) signals.mark.value = null;
-  }, timing.mark);
+const annulReveal = (
+  { signals, voice }: NoticeOutlets,
+  { side, line, announcement }: NoticeOf<'annul'>,
+) => {
+  const current = signals.reveal.peek();
+  if (current?.side === side) signals.reveal.value = { ...current, line, annulled: true };
+  voice.say(announcement);
   return done;
 };
 
-export const createNoticeHandlers = (
-  outlets: NoticeOutlets,
-  show: Pick<NoticeHandlers, 'banner' | 'headline'>,
-): NoticeHandlers => {
-  const { signals } = outlets;
+const queuedHandlers = ({ signals, timing, queue, voice }: NoticeOutlets) => {
   let shown = 0;
+  const outlets = { signals, timing, voice };
   const nextId = () => (shown += 1);
   return {
-    ...show,
-    mark: (notice) => showMark(outlets, notice, nextId()),
-    strip: ({ side }) => {
-      signals.strip.value = { id: nextId(), side };
-      return done;
-    },
-    reveal: (notice) => revealEffect(outlets, notice, nextId()),
-    life: (notice) => showLife(signals, notice),
+    banner: (notice: NoticeOf<'banner'>) =>
+      queue.present(QUEUE_ITEMS.banner(outlets, notice, nextId())),
+    headline: (notice: NoticeOf<'headline'>) =>
+      queue.present(QUEUE_ITEMS.headline(outlets, notice, nextId())),
+    mark: (notice: NoticeOf<'mark'>) => queue.present(QUEUE_ITEMS.mark(outlets, notice, nextId())),
+    strip: (notice: NoticeOf<'strip'>) =>
+      signals.prompt.peek() === null
+        ? queue.present(QUEUE_ITEMS.strip(outlets, notice, nextId()))
+        : done,
+    reveal: (notice: NoticeOf<'reveal'>) =>
+      queue.present(QUEUE_ITEMS.reveal(outlets, notice, nextId())),
+  };
+};
+
+export const createNoticeHandlers = (outlets: NoticeOutlets): NoticeHandlers => {
+  const { signals, voice } = outlets;
+  return {
+    ...queuedHandlers(outlets),
+    annul: (notice) => annulReveal(outlets, notice),
+    life: (notice) => showLife(outlets, notice),
     announce: ({ announcement }) => {
-      signals.announcement.value = announcement;
+      voice.say(announcement);
       return done;
     },
     gameOver: ({ gameOver, announcement }) => {
+      outlets.clearNotices();
       signals.gameOver.value = gameOver;
-      signals.announcement.value = announcement;
+      voice.say(announcement);
       return done;
     },
     silent: () => done,

@@ -36,13 +36,7 @@ export const WAGER_COPY = { lower: 'Bajar apuesta', raise: 'Subir apuesta' };
 
 export const RAISE_COPY = { back: 'VOLVER', backLabel: 'Volver a las respuestas' };
 
-export const CONTINUE_COPY = {
-  touch: 'TOCA PARA SEGUIR',
-  click: 'CLIC O',
-  key: 'ESPACIO',
-  after: 'PARA SEGUIR',
-  label: 'Toca, haz clic o pulsa Espacio para seguir.',
-};
+export const SHEET_COPY = { close: 'Toca para cerrar.' };
 
 export const stripCopy = (side: Side, turnSeconds: number): StripCopy => ({
   title: bySide(side, 'TU TURNO', 'TURNO DEL RIVAL'),

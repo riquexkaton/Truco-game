@@ -2,26 +2,22 @@ import { STAKES } from '@domain/challenge/challenge';
 
 import type { GameEventOf } from '@application/ports/game-event';
 
-import { sheet } from '@ui/copy/headline';
 import type { NoticeBuilders } from '@ui/copy/notice';
-import { headlineNotice, markNotice } from '@ui/copy/notice';
+import { markNotice } from '@ui/copy/notice';
 import { num } from '@ui/copy/text';
 
 type ChallengeNotices = Pick<NoticeBuilders, 'challengeCalled' | 'challengeAccepted'>;
 
 const acceptedNotice = ({ by, stake, holder }: GameEventOf<'challengeAccepted'>) => {
-  const worth = `LA RONDA VALE ${num(stake)}`;
   if (by === 'rival') {
-    return headlineNotice(
-      sheet({
-        isRival: true,
-        seal: num(stake),
-        tone: 'lose',
-        title: 'EL RIVAL ACEPTA',
-        result: worth,
-      }),
-    );
+    return markNotice({
+      title: 'EL RIVAL ACEPTA',
+      detail: `La ronda vale ${num(stake)}.`,
+      tone: 'lose',
+      isRival: true,
+    });
   }
+  const worth = `LA RONDA VALE ${num(stake)}`;
   return markNotice({
     title: 'ACEPTAS',
     detail: holder === 'player' ? `${worth} · TIENES LA PALABRA` : worth,

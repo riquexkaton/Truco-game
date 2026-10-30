@@ -14,10 +14,18 @@ const settled = (promise: Promise<unknown>) => {
   return flag;
 };
 
-const ROUND: GameEvent = { type: 'roundStarted', round: 1, lead: 'player', vira: 'lirio' };
-const RITUAL: GameEvent = { type: 'ritualSung', side: 'rival' };
-const TIED: GameEvent = { type: 'roundEnded', winner: null, stake: 2 };
-const REFUSED: GameEvent = { type: 'pactRejected', by: 'rival', damage: 1 };
+const ROUND: GameEvent = { type: 'roundStarted', round: 2, lead: 'player', vira: 'lirio' };
+const RITUAL: GameEvent = { type: 'ritualSung', side: 'rival', annulsPact: false };
+const WON: GameEvent = { type: 'roundEnded', winner: 'player', stake: 2 };
+const LOST_MARK: GameEvent = { type: 'ritualLost' };
+const CALLED: GameEvent = { type: 'challengeCalled', by: 'player', level: 1 };
+const REVEALED: GameEvent = {
+  type: 'pactRevealed',
+  winner: 'rival',
+  amount: 2,
+  playerValue: 27,
+  rivalValue: 31,
+};
 
 const advance = (ms: number) => vi.advanceTimersByTimeAsync(ms);
 
@@ -29,97 +37,139 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('the HUD adapter', () => {
-  it('shows queued banners in order and resolves each once it is gone', async () => {
+describe('the HUD notice queue', () => {
+  it('resolves a notice as soon as it appears, not when it closes', async () => {
     const { port, view } = createHud({ reducedMotion: false });
-    const first = settled(port.notify(ROUND));
-    const second = settled(port.notify(RITUAL));
+    const shown = settled(port.notify(WON));
     await advance(0);
-    expect(view.banner.value?.title).toBe('RONDA 1');
-    await advance(1499);
-    expect(first.isDone).toBe(false);
+    expect(shown.isDone).toBe(true);
+    expect(view.banner.value).toMatchObject({ title: 'GANAS LA RONDA', duration: 1400 });
+    expect(view.announcement.value).toBe('GANAS LA RONDA. EL RIVAL PIERDE 2');
+    await advance(1399);
+    expect(view.banner.value?.title).toBe('GANAS LA RONDA');
     await advance(1);
-    expect(first.isDone).toBe(true);
-    expect(view.banner.value?.title).toBe('RITUAL');
-    await advance(1600);
-    expect(second.isDone).toBe(true);
     expect(view.banner.value).toBeNull();
   });
 
-  it('shortens banners under reduced motion', async () => {
-    const { port, view } = createHud({ reducedMotion: true });
-    const shown = settled(port.notify(ROUND));
-    await advance(0);
-    expect(view.banner.value?.duration).toBe(700);
-    await advance(700);
-    expect(shown.isDone).toBe(true);
-  });
-
-  it('reads headlines out one at a time, in order', async () => {
-    const { port, view } = createHud({ reducedMotion: false });
-    const first = settled(port.notify(TIED));
-    const second = settled(port.notify(REFUSED));
-    await advance(0);
-    expect(view.headline.value).toMatchObject({ text: 'RONDA EMPATADA. NADIE RECIBE DAÑO.' });
-    expect(view.announcement.value).toBe('RONDA EMPATADA. NADIE RECIBE DAÑO.');
-    await advance(3499);
-    expect(first.isDone).toBe(false);
-    await advance(1);
-    expect(first.isDone).toBe(true);
-    expect(view.headline.value?.headline.title).toBe('NO QUISO');
-    expect(second.isDone).toBe(false);
-  });
-
-  it('moves on by itself after a reading time that grows with the text', async () => {
-    const { port, view } = createHud({ reducedMotion: false });
-    const told = settled(port.notify(REFUSED));
-    await advance(0);
-    expect(view.headline.value?.duration).toBe(4200);
-    await advance(4199);
-    expect(told.isDone).toBe(false);
-    await advance(1);
-    expect(told.isDone).toBe(true);
-    expect(view.headline.value).toBeNull();
-  });
-
-  it('closes a headline early without letting its timer close the next one', async () => {
-    const { port, view } = createHud({ reducedMotion: true });
-    const first = settled(port.notify(TIED));
-    await advance(1000);
-    view.dismissHeadline();
-    await advance(0);
-    expect(first.isDone).toBe(true);
-    expect(view.headline.value).toBeNull();
-    view.dismissHeadline();
-    const second = settled(port.notify(REFUSED));
-    await advance(2500);
-    expect(view.headline.value?.headline.title).toBe('NO QUISO');
-    expect(second.isDone).toBe(false);
-  });
-
-  it('keeps a headline waiting until the banner before it is gone', async () => {
+  it('keeps each notice up for 1.2 s before the next one replaces it', async () => {
     const { port, view } = createHud({ reducedMotion: false });
     void port.notify(ROUND);
-    const told = settled(port.notify(TIED));
-    await advance(1499);
-    expect(view.headline.value).toBeNull();
+    const second = settled(port.notify(RITUAL));
+    await advance(1199);
+    expect(view.banner.value?.title).toBe('RONDA 2');
+    expect(second.isDone).toBe(false);
     await advance(1);
-    expect(view.banner.value).toBeNull();
-    expect(view.headline.value?.headline.title).toBe('RONDA EMPATADA');
-    expect(told.isDone).toBe(false);
+    expect(second.isDone).toBe(true);
+    expect(view.banner.value?.title).toBe('RITUAL');
   });
 
-  it('shows small marks without waiting and drops them after a while', async () => {
+  it('only cuts a notice short when another one is waiting', async () => {
     const { port, view } = createHud({ reducedMotion: false });
-    await port.notify({ type: 'ritualLost' });
+    await port.notify(LOST_MARK);
+    await advance(2000);
     expect(view.mark.value?.title).toBe('RITUAL PERDIDO');
-    await port.notify({ type: 'challengeCalled', by: 'player', level: 1 });
+    const next = settled(port.notify(CALLED));
+    await advance(0);
+    expect(next.isDone).toBe(true);
     expect(view.mark.value).toMatchObject({ title: 'DESAFÍO', tone: 'lose' });
-    expect(view.announcement.value).toBe('DESAFÍO. LA RONDA PASARÍA A VALER 4.');
     await advance(2799);
     expect(view.mark.value?.title).toBe('DESAFÍO');
     await advance(1);
     expect(view.mark.value).toBeNull();
+  });
+
+  it('shortens banners under reduced motion', async () => {
+    const { port, view } = createHud({ reducedMotion: true });
+    await port.notify(ROUND);
+    expect(view.banner.value?.duration).toBe(700);
+    await advance(700);
+    expect(view.banner.value).toBeNull();
+  });
+
+  it('lets a turn strip give way at once', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify({ type: 'turnStarted', side: 'player' });
+    expect(view.strip.value?.side).toBe('player');
+    await port.notify(LOST_MARK);
+    expect(view.strip.value).toBeNull();
+    expect(view.mark.value?.title).toBe('RITUAL PERDIDO');
+  });
+
+  it('drops every waiting notice when a question opens', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    void port.notify(ROUND);
+    const dropped = settled(port.notify(RITUAL));
+    void port.ask({ kind: 'foldConfirm', damage: 1 });
+    await advance(0);
+    expect(dropped.isDone).toBe(true);
+    expect(view.banner.value).toBeNull();
+    await advance(3000);
+    expect(view.banner.value).toBeNull();
+  });
+
+  it('drops the turn strip while a question is on screen', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify({ type: 'turnStarted', side: 'rival' });
+    void port.ask({ kind: 'foldConfirm', damage: 1 });
+    expect(view.strip.value).toBeNull();
+    await port.notify({ type: 'turnStarted', side: 'player' });
+    expect(view.strip.value).toBeNull();
+    view.prompt.value?.choose(false);
+    await port.notify({ type: 'turnStarted', side: 'player' });
+    expect(view.strip.value?.side).toBe('player');
+  });
+});
+
+describe('the HUD notices', () => {
+  it('keeps the Pacto sheet up until the next round starts', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify(REVEALED);
+    expect(view.headline.value?.headline.title).toBe('PACTO PERDIDO');
+    const strip = settled(port.notify(WON));
+    await advance(1200);
+    expect(strip.isDone).toBe(true);
+    expect(view.banner.value?.title).toBe('GANAS LA RONDA');
+    await advance(5000);
+    expect(view.headline.value?.headline.title).toBe('PACTO PERDIDO');
+    await port.notify(ROUND);
+    expect(view.headline.value).toBeNull();
+  });
+
+  it('reads the life hit after the notice that brought it, not instead of it', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify(WON);
+    await port.notify({ type: 'lifeChanged', side: 'rival', delta: -2, life: 18 });
+    expect(view.announcement.value).toBe('GANAS LA RONDA. EL RIVAL PIERDE 2. Vida del rival: 18.');
+    await advance(1000);
+    await port.notify({ type: 'lifeChanged', side: 'player', delta: 2, life: 20 });
+    expect(view.announcement.value).toBe('Tu vida: 20');
+  });
+
+  it('closes the Pacto sheet early when tapped', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify(REVEALED);
+    view.dismissHeadline();
+    expect(view.headline.value).toBeNull();
+  });
+
+  it('reveals the player’s own effect without waiting and hides it afterwards', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify({ type: 'effectUsed', side: 'player', effect: 'sello' });
+    expect(view.reveal.value).toMatchObject({ side: 'player', effect: 'sello', shown: true });
+    expect(view.announcement.value).toBe('Usas SELLO');
+    await advance(1700);
+    expect(view.reveal.value?.shown).toBe(false);
+    await advance(300);
+    expect(view.reveal.value).toBeNull();
+  });
+
+  it('stamps a rival effect annulled by the player’s Sello on the same card', async () => {
+    const { port, view } = createHud({ reducedMotion: false });
+    await port.notify({ type: 'effectUsed', side: 'rival', effect: 'golpe' });
+    expect(view.reveal.value).toMatchObject({ side: 'rival', annulled: false });
+    await port.notify({ type: 'effectAnnulled', side: 'rival' });
+    expect(view.reveal.value).toMatchObject({ annulled: true, line: 'Tu Sello lo anula.' });
+    expect(view.announcement.value).toBe('ANULADO. Tu Sello lo anula.');
   });
 
   it('answers with the timeout answer when the clock runs out', async () => {
@@ -146,27 +196,15 @@ describe('the HUD adapter', () => {
     await expect(answer).resolves.toBe(true);
   });
 
-  it('reveals the player’s own effect and hides it afterwards', async () => {
-    const { port, view } = createHud({ reducedMotion: false });
-    const reveal = settled(port.notify({ type: 'effectUsed', side: 'player', effect: 'sello' }));
-    expect(view.reveal.value).toMatchObject({ side: 'player', effect: 'sello', shown: true });
-    expect(view.announcement.value).toBe('Usas SELLO');
-    await advance(1700);
-    expect(view.reveal.value?.shown).toBe(false);
-    await advance(300);
-    expect(reveal.isDone).toBe(true);
-    expect(view.reveal.value).toBeNull();
-  });
-
-  it('marks life hits, turn strips and the end of the match', async () => {
+  it('marks life hits and ends the match over a clean table', async () => {
     const { port, view } = createHud({ reducedMotion: false });
     await port.notify({ type: 'lifeChanged', side: 'rival', delta: -3, life: 17 });
-    await port.notify({ type: 'turnStarted', side: 'rival' });
     expect(view.lifeHits.value.rival).toMatchObject({ delta: -3, hit: true });
-    expect(view.strip.value?.side).toBe('rival');
     await advance(900);
     expect(view.lifeHits.value.rival?.hit).toBe(false);
+    await port.notify(REVEALED);
     await port.notify({ type: 'matchOver', winner: 'player', life: 12, rounds: 3 });
+    expect(view.headline.value).toBeNull();
     expect(view.gameOver.value?.title).toBe('VICTORIA');
     view.closeGameOver();
     expect(view.gameOver.value).toBeNull();

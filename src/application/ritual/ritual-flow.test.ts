@@ -18,7 +18,9 @@ describe('the Ritual', () => {
     expect(store.canSingRitual.value).toBe(true);
     commands.singRitual();
     await harness.untilIdle();
-    expect(hud.eventsOf('ritualSung')).toEqual([{ type: 'ritualSung', side: 'player' }]);
+    expect(hud.eventsOf('ritualSung')).toEqual([
+      { type: 'ritualSung', side: 'player', annulsPact: false },
+    ]);
     expect(store.lives.value.rival).toBe(17);
     expect(table.callsTo('flyEffect')).toEqual(['player']);
     expect(hud.eventsOf('effectGained')).toEqual([
@@ -38,8 +40,9 @@ describe('the Ritual', () => {
       },
     );
     expect(hud.questions[0]).toMatchObject({ kind: 'pactAnswer', canRitual: true });
-    expect(hud.eventsOf('pactAnnulled')).toEqual([{ type: 'pactAnnulled', by: 'player' }]);
-    expect(hud.eventsOf('ritualSung')).toEqual([{ type: 'ritualSung', side: 'player' }]);
+    expect(hud.eventsOf('ritualSung')).toEqual([
+      { type: 'ritualSung', side: 'player', annulsPact: true },
+    ]);
     expect(store.lives.value.rival).toBe(17);
     expect(store.playerEffects.value).toEqual(['sanacion']);
     expect(store.pendingPactAmount.value).toBeNull();

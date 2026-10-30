@@ -10,8 +10,9 @@ export const PACT_ANSWER_TIMEOUT_SECONDS = 10;
 
 export const DEAL_SETTLE_MS = 600;
 export const DUEL_REVEAL_MS = 450;
+export const DUEL_BEAT_MS = 900;
 export const RIVAL_THINK_MS = 900;
-export const RIVAL_EFFECT_PAUSE_MS = 300;
+export const RIVAL_EFFECT_PAUSE_MS = 1400;
 export const RIVAL_ANSWER_MS = 500;
 export const PACT_ANSWER_MS = 500;
 export const RITUAL_GAIN_DELAY_MS = 700;

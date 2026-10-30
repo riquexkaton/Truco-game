@@ -21,7 +21,7 @@ export type GameEvent =
       readonly vira: FactionId;
     }
   | { readonly type: 'turnStarted'; readonly side: Side }
-  | { readonly type: 'ritualSung'; readonly side: Side }
+  | { readonly type: 'ritualSung'; readonly side: Side; readonly annulsPact: boolean }
   | { readonly type: 'ritualLost' }
   | {
       readonly type: 'duelResolved';
@@ -49,7 +49,6 @@ export type GameEvent =
   | { readonly type: 'pactCalled'; readonly by: Side; readonly bet: Bet; readonly first: boolean }
   | { readonly type: 'pactRejected'; readonly by: Side; readonly damage: number }
   | { readonly type: 'pactAccepted'; readonly by: Side; readonly amount: number }
-  | { readonly type: 'pactAnnulled'; readonly by: Side }
   | {
       readonly type: 'pactRevealed';
       readonly winner: Side;

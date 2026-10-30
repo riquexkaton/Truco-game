@@ -9,8 +9,6 @@ const banner = (title: string, subtitle: string, extra: object = {}) => ({
   banner: { title, subtitle, ...extra },
 });
 
-const headline = (fields: object) => ({ kind: 'headline', headline: fields });
-
 const mark = (fields: object) => ({ kind: 'mark', mark: fields });
 
 const duel = (result: 'player' | 'rival' | 'tie', duelIndex = 0): GameEventOf<'duelResolved'> => ({
@@ -32,45 +30,49 @@ const ROUND_CASES: [string, GameEvent, object][] = [
         duration: 1500,
       }),
       announcement: 'Vira: VELO. RONDA 2. SE REPARTEN 3 CARTAS · EMPIEZA EL RIVAL',
+      clearsSheet: true,
     },
   ],
   ['turnStarted', { type: 'turnStarted', side: 'player' }, { kind: 'strip', side: 'player' }],
   [
     'roundEnded with a winner',
     { type: 'roundEnded', winner: 'player', stake: 4 },
-    headline({
-      look: 'sheet',
-      seal: '−4',
-      tone: 'win',
-      title: 'GANAS LA RONDA',
-      result: 'EL RIVAL PIERDE 4',
-    }),
+    {
+      ...banner('GANAS LA RONDA', 'EL RIVAL PIERDE 4', {
+        kind: 'win',
+        seal: { value: '−4', caption: '' },
+        duration: 1400,
+      }),
+      clearsSheet: false,
+    },
+  ],
+  [
+    'roundEnded lost',
+    { type: 'roundEnded', winner: 'rival', stake: 2 },
+    banner('PIERDES LA RONDA', 'PIERDES 2 DE VIDA', { kind: 'lose' }),
   ],
   [
     'roundEnded tied',
     { type: 'roundEnded', winner: null, stake: 2 },
-    headline({ seal: '=', tone: 'tie', title: 'RONDA EMPATADA', result: 'NADIE RECIBE DAÑO' }),
+    banner('RONDA EMPATADA', 'NADIE RECIBE DAÑO', { kind: 'plain', seal: null, duration: 1400 }),
   ],
   [
     'the player folding',
     { type: 'retired', side: 'player', damage: 4, reason: 'fold' },
-    headline({
-      isRival: false,
-      seal: '−4',
-      tone: 'lose',
-      title: 'TE VAS',
-      result: 'PIERDES 4 DE VIDA',
-    }),
+    banner('TE VAS', 'PIERDES 4 DE VIDA', { kind: 'lose', seal: { value: '−4', caption: '' } }),
+  ],
+  [
+    'the player retiring',
+    { type: 'retired', side: 'player', damage: 1, reason: 'retire' },
+    banner('TE RETIRAS', 'PIERDES 1 DE VIDA', { kind: 'lose' }),
   ],
   [
     'the rival retiring',
-    { type: 'retired', side: 'rival', damage: 4, reason: 'retire' },
-    headline({
-      isRival: true,
-      tone: 'win',
-      title: 'EL RIVAL SE RETIRA',
-      result: 'EL RIVAL PIERDE 4',
-    }),
+    { type: 'retired', side: 'rival', damage: 1, reason: 'retire' },
+    {
+      ...banner('EL RIVAL SE RETIRA', 'EL RIVAL PIERDE 1', { kind: 'win', duration: 1400 }),
+      announcement: 'EL RIVAL SE RETIRA. EL RIVAL PIERDE 1',
+    },
   ],
   [
     'matchOver',
@@ -85,42 +87,29 @@ const ROUND_CASES: [string, GameEvent, object][] = [
 
 const DUEL_CASES: [string, GameEvent, object][] = [
   [
-    'duel won',
+    'a duel won, told only to the screen reader',
     {
       ...duel('player'),
       player: { cardId: 'garin', attack: 10 },
       rival: { cardId: 'ines', attack: 6 },
     },
-    headline({
-      look: 'duel',
-      tag: 'DUELO 1',
-      title: 'DUELO GANADO',
-      body: 'Garín (10) vence a Sor Inés (6).',
-      result: 'LLEVAS 1 DE 3',
-      tone: 'win',
-      player: { cardId: 'garin', name: 'Garín', attack: '10' },
-      rival: { cardId: 'ines', name: 'Sor Inés', attack: '6' },
-    }),
+    {
+      kind: 'announce',
+      announcement: 'DUELO 1 GANADO. Garín (10) vence a Sor Inés (6). LLEVAS 1 DE 3.',
+    },
   ],
   [
-    'duel lost',
+    'a duel lost, told only to the screen reader',
     duel('rival', 1),
-    headline({
-      tag: 'DUELO 2',
-      title: 'DUELO PERDIDO',
-      result: 'EL RIVAL LLEVA 2',
-      tone: 'lose',
-    }),
+    {
+      kind: 'announce',
+      announcement: 'DUELO 2 PERDIDO. Sor Inés (6) cae ante Garín (10). EL RIVAL LLEVA 2.',
+    },
   ],
   [
-    'duel tied',
+    'a duel tied',
     duel('tie'),
-    headline({
-      title: 'DUELO EMPATADO',
-      body: 'Sor Inés y Garín se anulan (6).',
-      result: 'DECIDE EL SIGUIENTE DUELO',
-      tone: 'tie',
-    }),
+    mark({ title: 'EMPATE', detail: 'Sor Inés y Garín se anulan (6).', tone: 'tie' }),
   ],
   [
     'effectEarned',
@@ -129,8 +118,18 @@ const DUEL_CASES: [string, GameEvent, object][] = [
   ],
   [
     'ritualSung',
-    { type: 'ritualSung', side: 'player' },
+    { type: 'ritualSung', side: 'player', annulsPact: false },
     banner('RITUAL', 'CANTAS RITUAL · EL RIVAL RECIBE 3 Y TOMAS UN EFECTO', { duration: 1600 }),
+  ],
+  [
+    'a rival Ritual that annuls the Pacto',
+    { type: 'ritualSung', side: 'rival', annulsPact: true },
+    banner('RITUAL', 'EL RIVAL CANTA RITUAL Y ANULA TU PACTO · RECIBES 3'),
+  ],
+  [
+    'a Ritual answer that annuls the rival’s Pacto',
+    { type: 'ritualSung', side: 'player', annulsPact: true },
+    banner('RITUAL', 'CANTAS RITUAL Y ANULAS SU PACTO · EL RIVAL RECIBE 3'),
   ],
   [
     'ritualLost',
@@ -149,9 +148,9 @@ describe('round and duel copy', () => {
     expect(noticeFor(event)).toMatchObject(expected);
   });
 
-  it('reads a headline out as whole sentences', () => {
-    expect(noticeFor(duel('rival'))).toMatchObject({
-      announcement: 'DUELO PERDIDO. Sor Inés (6) cae ante Garín (10). EL RIVAL LLEVA 2.',
+  it('reads a tie out as whole sentences', () => {
+    expect(noticeFor(duel('tie'))).toMatchObject({
+      announcement: 'EMPATE. Sor Inés y Garín se anulan (6).',
     });
   });
 });

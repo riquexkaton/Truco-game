@@ -5,7 +5,7 @@ import type { EffectId } from '@domain/effects/effect';
 import type { PerSide, Side } from '@domain/shared/side';
 import { bothSides } from '@domain/shared/side';
 
-import type { HeadlineCopy, MarkCopy } from '@ui/copy/headline';
+import type { MarkCopy, SheetHeadline } from '@ui/copy/headline';
 import type { BannerCopy, GameOverCopy } from '@ui/copy/notice';
 import type { PromptSpec } from '@ui/copy/prompt';
 import type { TableView } from '@ui/hud/table-watch';
@@ -21,9 +21,8 @@ export interface StripView {
 
 export interface HeadlineView {
   readonly id: number;
-  readonly headline: HeadlineCopy;
+  readonly headline: SheetHeadline;
   readonly text: string;
-  readonly duration: number;
 }
 
 export interface MarkView extends MarkCopy {
@@ -34,6 +33,8 @@ export interface RevealView {
   readonly id: number;
   readonly side: Side;
   readonly effect: EffectId;
+  readonly line: string;
+  readonly annulled: boolean;
   readonly shown: boolean;
 }
 

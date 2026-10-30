@@ -10,15 +10,15 @@ import { gainEffect } from '@application/effects/effect-gain';
 import type { GameContext } from '@application/game-context';
 import { announce, matchOf, pause } from '@application/game-context';
 import { beforeEffectGain, commit } from '@application/match/commit';
-import type { DuelCard, GameEvent } from '@application/ports/game-event';
-import { DUEL_REVEAL_MS } from '@application/timings';
+import type { DuelCard, GameEventOf } from '@application/ports/game-event';
+import { DUEL_BEAT_MS, DUEL_REVEAL_MS } from '@application/timings';
 
 const duelCard = (state: MatchState, side: Side): DuelCard => {
   const slot = itemAt(state.played[side], state.duel);
   return { cardId: slot.cardId, attack: playedAttack(state, slot) };
 };
 
-const duelReport = (before: MatchState, outcome: DuelOutcome): GameEvent => ({
+const duelReport = (before: MatchState, outcome: DuelOutcome): GameEventOf<'duelResolved'> => ({
   type: 'duelResolved',
   duel: before.duel,
   result: outcome.result,
@@ -38,10 +38,14 @@ export const resolveDuelFlow = async (game: GameContext): Promise<void> => {
   await pause(game, DUEL_REVEAL_MS);
   const before = matchOf(game);
   const outcome = resolveDuel(before, game.ports.random);
+  const report = duelReport(before, outcome);
   await commit(game, beforeEffectGain(outcome.state, before));
-  if (outcome.result !== 'tie') {
-    game.ports.table.markDuel({ duel: before.duel, winner: outcome.result });
-  }
-  await announce(game, duelReport(before, outcome));
+  game.ports.table.markDuel({
+    duel: report.duel,
+    result: report.result,
+    attacks: { player: report.player.attack, rival: report.rival.attack },
+  });
+  await announce(game, report);
+  await pause(game, DUEL_BEAT_MS);
   await rewardSeal(game, before, outcome);
 };

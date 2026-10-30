@@ -62,7 +62,7 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 
 ## Application
 
-- `ports/`: `TablePort` (animaciones 3D, todas devuelven `Promise`), `HudPort` (`notify(evento)` y `ask(pregunta)`; `notify` se resuelve cuando el aviso deja de verse, así que un anuncio grande hace esperar al juego hasta que se toca o termina su tiempo de lectura; mientras tanto `signals.announcing` para el reloj del turno), `Scheduler` (`wait(ms)`), `Random`, `TableListener` (la mesa 3D avisa a la UI de una carta jugada tocada, de la carta con sello bajo el ratón y de que se recogió la mesa; lo une `composition/launcher.ts`).
+- `ports/`: `TablePort` (animaciones 3D, todas devuelven `Promise`), `HudPort` (`notify(evento)` y `ask(pregunta)`; `notify` se resuelve cuando el aviso aparece, no cuando se va: el HUD lleva su propia cola para que no se pisen, pero el juego no espera a que se cierren; solo `ask` para el reloj del turno), `Scheduler` (`wait(ms)`), `Random`, `TableListener` (la mesa 3D avisa a la UI de una carta jugada tocada, de la carta con sello bajo el ratón y de que se recogió la mesa; lo une `composition/launcher.ts`).
 - `store/`: estado observable con `@preact/signals-core` (vida, resultados de duelos, apuesta, Pacto en juego, efectos, maldición/sello, fase, temporizador). La UI solo lee de aquí y llama comandos.
 - Casos de uso por carpeta (`round/`, `challenge/`, `pact/`, `effects/`, `turn-timer/`) que reciben sus dependencias por parámetro. Nada de singletons.
 - `GameCommands`: `start`, `playCard`, `callChallenge`, `callPact`, `singRitual`, `fold`, `useEffect`, `restart`.
@@ -76,7 +76,7 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 
 ## UI
 
-- `atoms/` (Hanko, PaperTag, AsideButton…), `molecules/` (AnswerButton, HeadlineSheet, DuelBand, LifeCounter…), `organisms/` (ActionBar, PromptCard, Headline, Mark, Banner, TurnBar, GameOver, TitleScreen…).
+- `atoms/` (Hanko, PaperTag, AsideButton…), `molecules/` (AnswerButton, HeadlineSheet, ResultStamp, LifeCounter…), `organisms/` (ActionBar, PromptCard, Headline, Mark, Banner, TurnBar, GameOver, TitleScreen…).
 - `containers/` conectan el store y los comandos con componentes presentacionales puros (props in, eventos out).
 - Estilos: Tailwind 4 primero (`@theme` con los tokens de `docs/hud.md`); CSS propio solo para keyframes, patrones y pseudo-elementos que Tailwind no cubre.
 - Accesibilidad: `aria-label`, foco visible, región `aria-live`, `prefers-reduced-motion`.

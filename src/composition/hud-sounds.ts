@@ -20,10 +20,10 @@ const isRivalCall = (question: Question): boolean =>
   (question.kind === 'pactAnswer' && question.first);
 
 export const withHudSounds = (hud: HudPort, play: PlayHudSound): HudPort => ({
-  notify: (event) => {
+  notify: async (event) => {
+    await hud.notify(event);
     const sound = EVENT_SOUNDS[event.type];
     if (sound !== undefined) play(sound);
-    return hud.notify(event);
   },
   ask: <Q extends Question>(question: Q) => {
     if (isRivalCall(question)) play('call');

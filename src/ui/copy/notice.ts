@@ -3,8 +3,8 @@ import type { Side } from '@domain/shared/side';
 
 import type { GameEventOf, GameEventType } from '@application/ports/game-event';
 
-import type { HeadlineCopy, MarkCopy, SheetFields } from '@ui/copy/headline';
-import { sheet, spoken } from '@ui/copy/headline';
+import type { MarkCopy, SheetHeadline } from '@ui/copy/headline';
+import { spoken } from '@ui/copy/headline';
 
 export type BannerKind = 'plain' | 'win' | 'lose';
 
@@ -28,14 +28,26 @@ export interface GameOverCopy {
 }
 
 export type Notice =
-  | { readonly kind: 'banner'; readonly banner: BannerCopy; readonly announcement: string }
-  | { readonly kind: 'headline'; readonly headline: HeadlineCopy; readonly announcement: string }
+  | {
+      readonly kind: 'banner';
+      readonly banner: BannerCopy;
+      readonly announcement: string;
+      readonly clearsSheet: boolean;
+    }
+  | { readonly kind: 'headline'; readonly headline: SheetHeadline; readonly announcement: string }
   | { readonly kind: 'mark'; readonly mark: MarkCopy; readonly announcement: string }
   | { readonly kind: 'strip'; readonly side: Side }
   | {
       readonly kind: 'reveal';
       readonly side: Side;
       readonly effect: EffectId;
+      readonly line: string;
+      readonly announcement: string;
+    }
+  | {
+      readonly kind: 'annul';
+      readonly side: Side;
+      readonly line: string;
       readonly announcement: string;
     }
   | {
@@ -73,19 +85,18 @@ export const bannerCopy = (
   ...style,
 });
 
-export const bannerNotice = (banner: BannerCopy, preface = ''): Notice => ({
+export const bannerNotice = (banner: BannerCopy, preface = ''): NoticeOf<'banner'> => ({
   kind: 'banner',
   banner,
   announcement: `${preface}${banner.title}${banner.subtitle === '' ? '' : `. ${banner.subtitle}`}`,
+  clearsSheet: false,
 });
 
-export const headlineNotice = (headline: HeadlineCopy): Notice => ({
+export const sheetNotice = (headline: SheetHeadline): Notice => ({
   kind: 'headline',
   headline,
   announcement: spoken(headline.title, headline.body, headline.result),
 });
-
-export const sheetNotice = (fields: SheetFields): Notice => headlineNotice(sheet(fields));
 
 export const markNotice = (mark: MarkCopy): Notice => ({
   kind: 'mark',

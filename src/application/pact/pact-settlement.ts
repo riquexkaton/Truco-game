@@ -13,11 +13,8 @@ export interface PactClosing {
   readonly answer: Exclude<PactAnswer, { readonly kind: 'raise' }>;
 }
 
-const annulWithRitual = async (game: GameContext, negotiation: PactNegotiation) => {
-  const by = responderOf(negotiation);
-  await announce(game, { type: 'pactAnnulled', by });
-  await singRitualFlow(game, by);
-};
+const annulWithRitual = (game: GameContext, negotiation: PactNegotiation) =>
+  singRitualFlow(game, responderOf(negotiation), true);
 
 const rejectFlow = async (game: GameContext, negotiation: PactNegotiation) => {
   const by = responderOf(negotiation);

@@ -43,7 +43,7 @@ const turnSideOf = (signals: GameSignals): Side | null => {
 };
 
 const isTurnPausedOf = (signals: GameSignals): boolean =>
-  turnSideOf(signals) === 'player' && (signals.prompting.value || signals.announcing.value > 0);
+  turnSideOf(signals) === 'player' && signals.prompting.value;
 
 export const createMatchModels = (signals: GameSignals): MatchModels => ({
   lives: fromMatch(signals, (state) => state.lives, fullLives()),
