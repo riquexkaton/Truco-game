@@ -39,15 +39,25 @@ const showLife = (signals: HudSignals, { side, delta, announcement }: NoticeOf<'
   return done;
 };
 
+const showMark = ({ signals, timing }: NoticeOutlets, notice: NoticeOf<'mark'>, id: number) => {
+  signals.mark.value = { ...notice.mark, id };
+  signals.announcement.value = notice.announcement;
+  setTimeout(() => {
+    if (signals.mark.peek()?.id === id) signals.mark.value = null;
+  }, timing.mark);
+  return done;
+};
+
 export const createNoticeHandlers = (
   outlets: NoticeOutlets,
-  show: Pick<NoticeHandlers, 'banner' | 'toast'>,
+  show: Pick<NoticeHandlers, 'banner' | 'headline'>,
 ): NoticeHandlers => {
   const { signals } = outlets;
   let shown = 0;
   const nextId = () => (shown += 1);
   return {
     ...show,
+    mark: (notice) => showMark(outlets, notice, nextId()),
     strip: ({ side }) => {
       signals.strip.value = { id: nextId(), side };
       return done;

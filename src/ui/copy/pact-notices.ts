@@ -1,72 +1,101 @@
 import type { GameEventOf } from '@application/ports/game-event';
 
 import type { NoticeBuilders } from '@ui/copy/notice';
-import { toastNotice } from '@ui/copy/notice';
-import { BET_NAMES, bySide, num } from '@ui/copy/text';
+import { markNotice, sheetNotice, SILENT } from '@ui/copy/notice';
+import { BET_NAMES, bySide, MINUS, num } from '@ui/copy/text';
 
 type PactNotices = Pick<
   NoticeBuilders,
   'pactCalled' | 'pactRejected' | 'pactAccepted' | 'pactAnnulled' | 'pactRevealed'
 >;
 
-const pactCalledTitle = ({ by, bet, first }: GameEventOf<'pactCalled'>): string => {
-  if (by === 'rival') return 'EL RIVAL SUBE';
-  return first ? `CANTAS ${BET_NAMES[bet.kind]}` : `SUBES · ${BET_NAMES[bet.kind]}`;
+const pactCalledNotice = ({ by, bet, first }: GameEventOf<'pactCalled'>) => {
+  if (by === 'rival') return SILENT;
+  const name = BET_NAMES[bet.kind];
+  return markNotice({
+    title: first ? `CANTAS ${name}` : `SUBES · ${name}`,
+    detail: `Quien pierda recibe ${num(bet.amount)}. Esperas la respuesta del rival.`,
+    tone: 'ink',
+  });
 };
 
-const pactCalledNotice = (event: GameEventOf<'pactCalled'>) =>
-  toastNotice({
-    title: pactCalledTitle(event),
-    tag: 'PACTO',
-    body: bySide(event.by, 'Esperando la respuesta del rival.', `${BET_NAMES[event.bet.kind]}.`),
-    result: `QUIEN PIERDA RECIBE ${num(event.bet.amount)}`,
-    tone: 'ink',
-    seal: num(event.bet.amount),
+const rejectedNotice = ({ by, damage }: GameEventOf<'pactRejected'>) => {
+  const amount = num(damage);
+  if (by === 'player') {
+    return markNotice({
+      title: 'NO QUIERES',
+      detail: `Rechazas el Pacto: pierdes ${amount}.`,
+      tone: 'lose',
+    });
+  }
+  return sheetNotice({
+    isRival: true,
+    seal: `${MINUS}${amount}`,
+    tone: 'win',
+    title: 'NO QUISO',
+    body: 'El rival rechazó tu Pacto.',
+    result: `EL RIVAL PIERDE ${amount}`,
   });
+};
 
-const pactRevealedNotice = ({
-  winner,
-  amount,
-  playerValue,
-  rivalValue,
-}: GameEventOf<'pactRevealed'>) =>
-  toastNotice({
-    title: bySide(winner, 'PACTO GANADO', 'PACTO PERDIDO'),
-    tag: 'REVELADO',
-    body: `Tu ${num(playerValue)} contra su ${num(rivalValue)}.`,
-    result: bySide(winner, `EL RIVAL PIERDE ${num(amount)}`, `PIERDES ${num(amount)} DE VIDA`),
-    tone: bySide(winner, 'win', 'lose'),
-    seal: num(playerValue),
+const acceptedNotice = ({ by, amount }: GameEventOf<'pactAccepted'>) => {
+  const reveal = 'se revela al final de la ronda.';
+  if (by === 'player') {
+    return markNotice({
+      title: 'QUIERES',
+      detail: `El Pacto vale ${num(amount)}: ${reveal}`,
+      tone: 'ink',
+    });
+  }
+  return sheetNotice({
+    isRival: true,
+    seal: num(amount),
+    tone: 'ink',
+    title: 'EL RIVAL QUISO',
+    body: `Acepta tu Pacto: ${reveal}`,
+    result: `EN JUEGO · VALE ${num(amount)}`,
   });
+};
+
+const annulledNotice = ({ by }: GameEventOf<'pactAnnulled'>) => {
+  if (by === 'player') {
+    return markNotice({
+      title: 'PACTO ANULADO',
+      detail: 'Respondes con Ritual: el Pacto no cuenta.',
+      tone: 'rule',
+    });
+  }
+  return sheetNotice({
+    isRival: true,
+    seal: '×',
+    tone: 'rule',
+    title: 'PACTO ANULADO',
+    body: 'El rival responde con Ritual.',
+    result: 'NADIE RECIBE DAÑO',
+  });
+};
+
+const valuesLine = ({ playerValue, rivalValue }: GameEventOf<'pactRevealed'>): string => {
+  const values = `Tu Pacto: ${num(playerValue)}. El del rival: ${num(rivalValue)}.`;
+  return playerValue === rivalValue ? `${values} Empate: gana quien empezó la ronda.` : values;
+};
+
+const revealedNotice = (event: GameEventOf<'pactRevealed'>) => {
+  const { winner } = event;
+  const amount = num(event.amount);
+  return sheetNotice({
+    seal: `${MINUS}${amount}`,
+    tone: bySide(winner, 'win', 'lose'),
+    title: bySide(winner, 'PACTO GANADO', 'PACTO PERDIDO'),
+    body: valuesLine(event),
+    result: bySide(winner, `EL RIVAL PIERDE ${amount}`, `PIERDES ${amount} DE VIDA`),
+  });
+};
 
 export const PACT_NOTICES: PactNotices = {
   pactCalled: pactCalledNotice,
-  pactRejected: ({ by, damage }) =>
-    toastNotice({
-      title: bySide(by, 'NO QUIERES', 'NO QUISO'),
-      tag: 'PACTO',
-      body: bySide(by, 'Rechazaste el Pacto.', 'El rival rechazó tu Pacto.'),
-      result: bySide(by, `PIERDES ${num(damage)}`, `EL RIVAL PIERDE ${num(damage)}`),
-      tone: bySide(by, 'lose', 'win'),
-      seal: num(damage),
-    }),
-  pactAccepted: ({ by, amount }) =>
-    toastNotice({
-      title: 'PACTO',
-      tag: bySide(by, 'QUIERES', 'QUISO'),
-      body: `${bySide(by, 'Aceptaste el Pacto.', 'El rival quiso tu Pacto.')} Se revela al final de la ronda.`,
-      result: `EN JUEGO · VALE ${num(amount)}`,
-      tone: 'ink',
-      seal: num(amount),
-    }),
-  pactAnnulled: ({ by }) =>
-    toastNotice({
-      title: 'PACTO ANULADO',
-      tag: 'RITUAL',
-      body: `${bySide(by, 'Respondes', 'El rival responde')} con Ritual: el Pacto no cuenta.`,
-      result: 'NADIE RECIBE DAÑO DEL PACTO',
-      tone: 'rule',
-      seal: '×',
-    }),
-  pactRevealed: pactRevealedNotice,
+  pactRejected: rejectedNotice,
+  pactAccepted: acceptedNotice,
+  pactAnnulled: annulledNotice,
+  pactRevealed: revealedNotice,
 };

@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 
 interface PaperTagProps {
-  readonly dot: string;
+  readonly dot: string | null;
   readonly size: 'md' | 'sm';
   readonly class?: string;
   readonly children: ComponentChildren;
@@ -19,7 +19,7 @@ export const PaperTag = ({ dot, size, class: className = '', children }: PaperTa
     <span
       class={`flex items-center gap-2 shadow-[inset_0_0_0_1.5px_var(--color-ink)] ${SIZES[size].inner}`}
     >
-      <i class={`block size-2 -rotate-4 rounded-[2px] ${dot}`} />
+      {dot === null ? null : <i class={`block size-2 -rotate-4 rounded-[2px] ${dot}`} />}
       {children}
     </span>
   </span>

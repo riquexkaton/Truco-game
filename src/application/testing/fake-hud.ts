@@ -9,8 +9,29 @@ export interface FakeHud extends HudPort {
   readonly script: <K extends QuestionKind>(kind: K, ...answers: Answer<K>[]) => void;
   readonly hold: (kind: QuestionKind) => void;
   readonly release: <K extends QuestionKind>(kind: K, answer: Answer<K>) => void;
+  readonly holdEvent: (type: GameEventType) => void;
+  readonly releaseEvent: (type: GameEventType) => void;
   readonly eventsOf: <T extends GameEventType>(type: T) => GameEventOf<T>[];
 }
+
+const createEventHolds = () => {
+  const held = new Map<GameEventType, Deferred<void> | null>();
+  return {
+    shown: (type: GameEventType): Promise<void> => {
+      if (!held.has(type)) return Promise.resolve();
+      const pending: Deferred<void> = deferred();
+      held.set(type, pending);
+      return pending.promise;
+    },
+    holdEvent: (type: GameEventType) => {
+      held.set(type, null);
+    },
+    releaseEvent: (type: GameEventType) => {
+      held.get(type)?.resolve();
+      held.delete(type);
+    },
+  };
+};
 
 interface AnswerBook {
   readonly scripts: Map<QuestionKind, unknown[]>;
@@ -49,12 +70,15 @@ export const createFakeHud = (): FakeHud => {
   const events: GameEvent[] = [];
   const questions: Question[] = [];
   const book: AnswerBook = { scripts: new Map(), held: new Map() };
+  const { shown, holdEvent, releaseEvent } = createEventHolds();
   return {
     events,
     questions,
+    holdEvent,
+    releaseEvent,
     notify: (event) => {
       events.push(event);
-      return Promise.resolve();
+      return shown(event.type);
     },
     ask: <Q extends Question>(question: Q) => {
       questions.push(question);

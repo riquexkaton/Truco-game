@@ -34,8 +34,15 @@ export const replaceMatch = (game: GameContext, state: MatchState): void => {
 export const pause = (game: GameContext, ms: number): Promise<void> =>
   game.ports.scheduler.wait(ms);
 
-export const announce = (game: GameContext, event: GameEvent): Promise<void> =>
-  game.ports.hud.notify(event);
+export const announce = async (game: GameContext, event: GameEvent): Promise<void> => {
+  const { announcing } = game.signals;
+  announcing.value += 1;
+  try {
+    await game.ports.hud.notify(event);
+  } finally {
+    announcing.value -= 1;
+  }
+};
 
 export const ask = async <Q extends Question>(
   game: GameContext,

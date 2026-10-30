@@ -23,7 +23,7 @@ const answerOf = async (game: GameContext, negotiation: PactNegotiation): Promis
   if (isAnnounced(negotiation)) {
     const { caller: by, bet, first } = negotiation;
     await announce(game, { type: 'pactCalled', by, bet, first });
-    await pause(game, PACT_ANSWER_MS);
+    if (by === 'player') await pause(game, PACT_ANSWER_MS);
   }
   return responderOf(negotiation) === 'player'
     ? askPactAnswer(game, negotiation)

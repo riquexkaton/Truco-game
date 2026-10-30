@@ -5,8 +5,10 @@ import type { EffectId } from '@domain/effects/effect';
 import type { PerSide, Side } from '@domain/shared/side';
 import { bothSides } from '@domain/shared/side';
 
-import type { BannerCopy, GameOverCopy, ToastCopy } from '@ui/copy/notice';
+import type { HeadlineCopy, MarkCopy } from '@ui/copy/headline';
+import type { BannerCopy, GameOverCopy } from '@ui/copy/notice';
 import type { PromptSpec } from '@ui/copy/prompt';
+import type { TableView } from '@ui/hud/table-watch';
 
 export interface BannerView extends BannerCopy {
   readonly id: number;
@@ -17,10 +19,15 @@ export interface StripView {
   readonly side: Side;
 }
 
-export interface ToastView extends ToastCopy {
+export interface HeadlineView {
   readonly id: number;
+  readonly headline: HeadlineCopy;
+  readonly text: string;
   readonly duration: number;
-  readonly leaving: boolean;
+}
+
+export interface MarkView extends MarkCopy {
+  readonly id: number;
 }
 
 export interface RevealView {
@@ -50,7 +57,8 @@ export interface PromptTimerView {
 export interface HudSignals {
   readonly banner: Signal<BannerView | null>;
   readonly strip: Signal<StripView | null>;
-  readonly toasts: Signal<readonly ToastView[]>;
+  readonly headline: Signal<HeadlineView | null>;
+  readonly mark: Signal<MarkView | null>;
   readonly reveal: Signal<RevealView | null>;
   readonly prompt: Signal<PromptView | null>;
   readonly promptTimer: Signal<PromptTimerView | null>;
@@ -63,15 +71,16 @@ type HudState = {
   readonly [K in keyof HudSignals]: ReadonlySignal<HudSignals[K]['value']>;
 };
 
-export interface HudView extends HudState {
-  readonly dismissToast: (id: number) => void;
+export interface HudView extends HudState, TableView {
+  readonly dismissHeadline: () => void;
   readonly closeGameOver: () => void;
 }
 
 export const createHudSignals = (): HudSignals => ({
   banner: signal<BannerView | null>(null),
   strip: signal<StripView | null>(null),
-  toasts: signal<readonly ToastView[]>([]),
+  headline: signal<HeadlineView | null>(null),
+  mark: signal<MarkView | null>(null),
   reveal: signal<RevealView | null>(null),
   prompt: signal<PromptView | null>(null),
   promptTimer: signal<PromptTimerView | null>(null),

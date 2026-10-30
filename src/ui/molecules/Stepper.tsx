@@ -25,7 +25,7 @@ const StepButton = ({ label, step, onStep }: StepButtonProps) => (
     onClick={() => {
       onStep(step);
     }}
-    class="h-11 w-10 cursor-pointer bg-transparent font-mincho text-[18px] leading-none font-extrabold text-ink hover:bg-ink/8 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ink"
+    class="w-11 cursor-pointer bg-transparent font-mincho text-[18px] leading-none font-extrabold text-ink hover:bg-ink/8 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ink tall:w-10"
   >
     {step < 0 ? '−' : '+'}
   </button>
@@ -39,7 +39,7 @@ const submitOnEnter =
   };
 
 export const Stepper = ({ value, min, max, onInput, onStep, onCommit, onSubmit }: StepperProps) => (
-  <div class="flex h-11 items-center bg-washi2 shadow-[inset_0_0_0_1.5px_var(--color-ink)]">
+  <div class="flex shrink-0 items-stretch rounded-[2px] bg-washi2 shadow-[inset_0_0_0_1.5px_var(--color-ink)]">
     <StepButton label={WAGER_COPY.lower} step={-1} onStep={onStep} />
     <input
       type="number"
@@ -53,7 +53,7 @@ export const Stepper = ({ value, min, max, onInput, onStep, onCommit, onSubmit }
       }}
       onChange={onCommit}
       onKeyDown={submitOnEnter(onSubmit)}
-      class="h-11 w-[52px] [appearance:textfield] bg-transparent text-center font-mincho text-[20px] leading-none font-extrabold text-red focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ink [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+      class="w-12 [appearance:textfield] bg-transparent text-center font-mincho text-[21px] leading-none font-extrabold text-red focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ink tall:w-10 tall:text-[20px] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
     />
     <StepButton label={WAGER_COPY.raise} step={1} onStep={onStep} />
   </div>

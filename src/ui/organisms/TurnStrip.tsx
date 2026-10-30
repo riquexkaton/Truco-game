@@ -22,7 +22,7 @@ export const TurnStrip = ({ strip }: TurnStripProps) =>
     <div
       key={strip.id}
       aria-hidden="true"
-      class={`paper-rule pointer-events-none fixed top-[33%] left-1/2 flex h-[98px] w-[min(520px,calc(100vw-32px))] [transform:translate(-50%,-50%)] flex-col items-center justify-center gap-1.5 bg-washi px-7 text-ink opacity-0 shadow-[0_24px_50px_rgb(0_0_0/0.65)] [--rule-inset:9px] narrow:h-[84px] narrow:px-[18px] ${LOOK[strip.side].strip}`}
+      class={`paper-rule pointer-events-none fixed top-[33%] left-1/2 flex h-[98px] w-[min(520px,calc(100vw-32px))] [transform:translate(-50%,-50%)] flex-col items-center justify-center gap-1.5 bg-washi px-7 text-ink opacity-0 shadow-[0_24px_50px_rgb(0_0_0/0.65)] [--rule-inset:9px] narrow:h-[84px] narrow:px-[18px] tall:top-[calc(114px+env(safe-area-inset-top,0px))] ${LOOK[strip.side].strip}`}
     >
       <i
         class={`absolute top-[10.5px] bottom-[10.5px] w-[50px] border-ink narrow:w-9 ${LOOK[strip.side].end}`}

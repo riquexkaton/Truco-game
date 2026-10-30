@@ -9,7 +9,9 @@ const banner = (title: string, subtitle: string, extra: object = {}) => ({
   banner: { title, subtitle, ...extra },
 });
 
-const toast = (fields: object) => ({ kind: 'toast', toast: fields });
+const headline = (fields: object) => ({ kind: 'headline', headline: fields });
+
+const mark = (fields: object) => ({ kind: 'mark', mark: fields });
 
 const duel = (result: 'player' | 'rival' | 'tie', duelIndex = 0): GameEventOf<'duelResolved'> => ({
   type: 'duelResolved',
@@ -36,26 +38,39 @@ const ROUND_CASES: [string, GameEvent, object][] = [
   [
     'roundEnded with a winner',
     { type: 'roundEnded', winner: 'player', stake: 4 },
-    banner('GANAS LA RONDA', 'EL RIVAL PIERDE 4', {
-      kind: 'win',
-      seal: { value: '4', caption: 'VALÍA' },
-      duration: 1400,
+    headline({
+      look: 'sheet',
+      seal: '−4',
+      tone: 'win',
+      title: 'GANAS LA RONDA',
+      result: 'EL RIVAL PIERDE 4',
     }),
   ],
   [
     'roundEnded tied',
     { type: 'roundEnded', winner: null, stake: 2 },
-    banner('RONDA EMPATADA', 'NADIE RECIBE DAÑO', { duration: 1300 }),
+    headline({ seal: '=', tone: 'tie', title: 'RONDA EMPATADA', result: 'NADIE RECIBE DAÑO' }),
   ],
   [
-    'retired by folding',
-    { type: 'retired', side: 'player', damage: 1, reason: 'fold' },
-    banner('TE VAS', 'PIERDES 1 DE VIDA', { kind: 'lose', seal: { value: '−1', caption: '' } }),
+    'the player folding',
+    { type: 'retired', side: 'player', damage: 4, reason: 'fold' },
+    headline({
+      isRival: false,
+      seal: '−4',
+      tone: 'lose',
+      title: 'TE VAS',
+      result: 'PIERDES 4 DE VIDA',
+    }),
   ],
   [
-    'retired rival',
+    'the rival retiring',
     { type: 'retired', side: 'rival', damage: 4, reason: 'retire' },
-    banner('EL RIVAL SE RETIRA', 'EL RIVAL PIERDE 4', { kind: 'win' }),
+    headline({
+      isRival: true,
+      tone: 'win',
+      title: 'EL RIVAL SE RETIRA',
+      result: 'EL RIVAL PIERDE 4',
+    }),
   ],
   [
     'matchOver',
@@ -76,32 +91,32 @@ const DUEL_CASES: [string, GameEvent, object][] = [
       player: { cardId: 'garin', attack: 10 },
       rival: { cardId: 'ines', attack: 6 },
     },
-    toast({
-      title: 'DUELO GANADO',
+    headline({
+      look: 'duel',
       tag: 'DUELO 1',
+      title: 'DUELO GANADO',
       body: 'Garín (10) vence a Sor Inés (6).',
       result: 'LLEVAS 1 DE 3',
       tone: 'win',
-      seal: '10',
+      player: { cardId: 'garin', name: 'Garín', attack: '10' },
+      rival: { cardId: 'ines', name: 'Sor Inés', attack: '6' },
     }),
   ],
   [
     'duel lost',
     duel('rival', 1),
-    toast({
-      title: 'DUELO PERDIDO',
+    headline({
       tag: 'DUELO 2',
-      body: 'Sor Inés (6) cae ante Garín (10).',
+      title: 'DUELO PERDIDO',
       result: 'EL RIVAL LLEVA 2',
       tone: 'lose',
-      seal: '6',
     }),
   ],
   [
     'duel tied',
     duel('tie'),
-    toast({
-      title: 'EMPATE',
+    headline({
+      title: 'DUELO EMPATADO',
       body: 'Sor Inés y Garín se anulan (6).',
       result: 'DECIDE EL SIGUIENTE DUELO',
       tone: 'tie',
@@ -110,14 +125,7 @@ const DUEL_CASES: [string, GameEvent, object][] = [
   [
     'effectEarned',
     { type: 'effectEarned', side: 'rival', cardId: 'garin' },
-    toast({
-      title: 'SELLO',
-      tag: 'EFECTO',
-      body: 'Garín lleva sello.',
-      result: 'EL RIVAL GANA UN EFECTO',
-      tone: 'lose',
-      seal: '★',
-    }),
+    mark({ title: 'SELLO', detail: 'Garín lleva sello: el rival gana un efecto.', tone: 'lose' }),
   ],
   [
     'ritualSung',
@@ -127,23 +135,12 @@ const DUEL_CASES: [string, GameEvent, object][] = [
   [
     'ritualLost',
     { type: 'ritualLost' },
-    toast({
-      title: 'RITUAL PERDIDO',
-      tag: 'RITUAL',
-      body: 'No lo cantaste antes de jugar.',
-      tone: 'rule',
-      seal: '×',
-    }),
+    mark({ title: 'RITUAL PERDIDO', detail: 'No lo cantaste antes de jugar.', tone: 'rule' }),
   ],
   [
     'turnTimedOut',
     { type: 'turnTimedOut', cardId: 'teo' },
-    toast({
-      title: 'SE ACABÓ EL TIEMPO',
-      body: 'Se jugó Teo, tu carta más baja.',
-      tone: 'lose',
-      seal: '0',
-    }),
+    mark({ title: 'SE ACABÓ EL TIEMPO', detail: 'Se jugó Teo, tu carta más baja.', tone: 'lose' }),
   ],
 ];
 
@@ -152,9 +149,9 @@ describe('round and duel copy', () => {
     expect(noticeFor(event)).toMatchObject(expected);
   });
 
-  it('announces toasts with title, body and result', () => {
+  it('reads a headline out as whole sentences', () => {
     expect(noticeFor(duel('rival'))).toMatchObject({
-      announcement: 'DUELO PERDIDO. Sor Inés (6) cae ante Garín (10).. EL RIVAL LLEVA 2',
+      announcement: 'DUELO PERDIDO. Sor Inés (6) cae ante Garín (10). EL RIVAL LLEVA 2.',
     });
   });
 });

@@ -9,7 +9,9 @@ import { tryPlayCard } from '@application/turn/player-play';
 import { isTurnOpen } from '@application/turn/turn-gate';
 
 const isTicking = (game: GameContext): boolean =>
-  canPlayerAct(game.signals) && !game.signals.prompting.value;
+  canPlayerAct(game.signals) &&
+  !game.signals.prompting.value &&
+  game.signals.announcing.value === 0;
 
 const tick = (game: GameContext, left: number): number => {
   if (!isTicking(game)) return left;

@@ -11,7 +11,7 @@ import type { GameContext } from '@application/game-context';
 import { announce, matchOf, pause } from '@application/game-context';
 import { beforeEffectGain, commit } from '@application/match/commit';
 import type { DuelCard, GameEvent } from '@application/ports/game-event';
-import { DUEL_REVEAL_MS, DUEL_SETTLE_MS } from '@application/timings';
+import { DUEL_REVEAL_MS } from '@application/timings';
 
 const duelCard = (state: MatchState, side: Side): DuelCard => {
   const slot = itemAt(state.played[side], state.duel);
@@ -44,5 +44,4 @@ export const resolveDuelFlow = async (game: GameContext): Promise<void> => {
   }
   await announce(game, duelReport(before, outcome));
   await rewardSeal(game, before, outcome);
-  await pause(game, DUEL_SETTLE_MS);
 };

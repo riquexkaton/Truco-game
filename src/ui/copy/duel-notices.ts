@@ -1,9 +1,10 @@
 import type { DuelResult } from '@domain/duel/duel';
 
-import type { GameEventOf } from '@application/ports/game-event';
+import type { DuelCard, GameEventOf } from '@application/ports/game-event';
 
-import type { NoticeBuilders, ToastCopy } from '@ui/copy/notice';
-import { bannerCopy, bannerNotice, toastNotice } from '@ui/copy/notice';
+import type { CardFace, DuelHeadline } from '@ui/copy/headline';
+import type { NoticeBuilders } from '@ui/copy/notice';
+import { bannerCopy, bannerNotice, headlineNotice, markNotice } from '@ui/copy/notice';
 import { bySide, cardName, num } from '@ui/copy/text';
 
 type DuelNotices = Pick<
@@ -13,60 +14,56 @@ type DuelNotices = Pick<
 
 type DuelEvent = GameEventOf<'duelResolved'>;
 
-interface DuelNames {
-  readonly mine: string;
-  readonly theirs: string;
-  readonly attack: string;
-  readonly rivalAttack: string;
-}
+type DuelLines = Pick<DuelHeadline, 'title' | 'body' | 'result' | 'tone'>;
 
-const DUEL_TOASTS: Readonly<
-  Record<DuelResult, (event: DuelEvent, names: DuelNames) => Omit<ToastCopy, 'tag' | 'seal'>>
+const faceOf = ({ cardId, attack }: DuelCard): CardFace => ({
+  cardId,
+  name: cardName(cardId),
+  attack: num(attack),
+});
+
+const DUEL_LINES: Readonly<
+  Record<DuelResult, (event: DuelEvent, mine: CardFace, theirs: CardFace) => DuelLines>
 > = {
-  player: ({ wins }, { mine, theirs, attack, rivalAttack }) => ({
+  player: ({ wins }, mine, theirs) => ({
     title: 'DUELO GANADO',
-    body: `${mine} (${attack}) vence a ${theirs} (${rivalAttack}).`,
+    body: `${mine.name} (${mine.attack}) vence a ${theirs.name} (${theirs.attack}).`,
     result: `LLEVAS ${num(wins.player)} DE 3`,
     tone: 'win',
   }),
-  rival: ({ wins }, { mine, theirs, attack, rivalAttack }) => ({
+  rival: ({ wins }, mine, theirs) => ({
     title: 'DUELO PERDIDO',
-    body: `${mine} (${attack}) cae ante ${theirs} (${rivalAttack}).`,
+    body: `${mine.name} (${mine.attack}) cae ante ${theirs.name} (${theirs.attack}).`,
     result: `EL RIVAL LLEVA ${num(wins.rival)}`,
     tone: 'lose',
   }),
-  tie: ({ duel }, { mine, theirs, attack }) => ({
-    title: 'EMPATE',
-    body: `${mine} y ${theirs} se anulan (${attack}).`,
+  tie: ({ duel }, mine, theirs) => ({
+    title: 'DUELO EMPATADO',
+    body: `${mine.name} y ${theirs.name} se anulan (${mine.attack}).`,
     result: duel === 0 ? 'DECIDE EL SIGUIENTE DUELO' : 'DECIDE EL PRIMER DUELO',
     tone: 'tie',
   }),
 };
 
 const duelNotice = (event: DuelEvent) => {
-  const names: DuelNames = {
-    mine: cardName(event.player.cardId),
-    theirs: cardName(event.rival.cardId),
-    attack: num(event.player.attack),
-    rivalAttack: num(event.rival.attack),
-  };
-  return toastNotice({
-    ...DUEL_TOASTS[event.result](event, names),
+  const player = faceOf(event.player);
+  const rival = faceOf(event.rival);
+  return headlineNotice({
+    look: 'duel',
     tag: `DUELO ${num(event.duel + 1)}`,
-    seal: names.attack,
+    ...DUEL_LINES[event.result](event, player, rival),
+    player,
+    rival,
   });
 };
 
 export const DUEL_NOTICES: DuelNotices = {
   duelResolved: duelNotice,
   effectEarned: ({ side, cardId }) =>
-    toastNotice({
+    markNotice({
       title: 'SELLO',
-      tag: 'EFECTO',
-      body: `${cardName(cardId)} lleva sello.`,
-      result: bySide(side, 'GANAS UN EFECTO', 'EL RIVAL GANA UN EFECTO'),
+      detail: `${cardName(cardId)} lleva sello: ${bySide(side, 'ganas un efecto', 'el rival gana un efecto')}.`,
       tone: bySide(side, 'win', 'lose'),
-      seal: '★',
     }),
   ritualSung: ({ side }) =>
     bannerNotice(
@@ -81,21 +78,11 @@ export const DUEL_NOTICES: DuelNotices = {
       ),
     ),
   ritualLost: () =>
-    toastNotice({
-      title: 'RITUAL PERDIDO',
-      tag: 'RITUAL',
-      body: 'No lo cantaste antes de jugar.',
-      result: '',
-      tone: 'rule',
-      seal: '×',
-    }),
+    markNotice({ title: 'RITUAL PERDIDO', detail: 'No lo cantaste antes de jugar.', tone: 'rule' }),
   turnTimedOut: ({ cardId }) =>
-    toastNotice({
+    markNotice({
       title: 'SE ACABÓ EL TIEMPO',
-      tag: '',
-      body: `Se jugó ${cardName(cardId)}, tu carta más baja.`,
-      result: '',
+      detail: `Se jugó ${cardName(cardId)}, tu carta más baja.`,
       tone: 'lose',
-      seal: '0',
     }),
 };

@@ -110,6 +110,9 @@ describe('Me voy', () => {
     expect(harness.hud.eventsOf('retired')).toEqual([
       { type: 'retired', side: 'player', damage: 1, reason: 'fold' },
     ]);
+    expect(harness.hud.eventsOf('pactRevealed')).toEqual([
+      { type: 'pactRevealed', winner: 'player', amount: 2, playerValue: 36, rivalValue: 28 },
+    ]);
     expect(harness.hud.eventsOf('roundEnded')).toEqual([]);
   });
 });

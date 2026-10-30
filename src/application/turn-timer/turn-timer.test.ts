@@ -36,6 +36,7 @@ describe('the turn timer', () => {
     commands.callPact();
     await clock.advance(30_000);
     expect(store.prompting.value).toBe(true);
+    expect(store.isTurnPaused.value).toBe(true);
     expect(store.turnSecondsLeft.value).toBe(15);
     expect(hud.eventsOf('turnTimedOut')).toEqual([]);
     hud.release('pactCall', null);
@@ -44,6 +45,19 @@ describe('the turn timer', () => {
     expect(hud.eventsOf('turnTimedOut')).toEqual([]);
     await clock.advance(100);
     expect(hud.eventsOf('turnTimedOut')).toHaveLength(1);
+  });
+
+  it('pauses while an announcement is still on screen', async () => {
+    const { clock, store, hud } = await startedHarness({ round: HAND }, (fake) => {
+      fake.holdEvent('turnStarted');
+    });
+    await clock.advance(30_000);
+    expect(store.turnSecondsLeft.value).toBe(20);
+    expect(store.isTurnPaused.value).toBe(true);
+    hud.releaseEvent('turnStarted');
+    await clock.advance(5000);
+    expect(store.isTurnPaused.value).toBe(false);
+    expect(store.turnSecondsLeft.value).toBe(15);
   });
 
   it('restarts at 20 seconds on the next turn', async () => {

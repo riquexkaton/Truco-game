@@ -3,7 +3,8 @@ import type { Side } from '@domain/shared/side';
 
 import type { GameEventOf, GameEventType } from '@application/ports/game-event';
 
-export type Tone = 'win' | 'lose' | 'tie' | 'ink' | 'rule';
+import type { HeadlineCopy, MarkCopy, SheetFields } from '@ui/copy/headline';
+import { sheet, spoken } from '@ui/copy/headline';
 
 export type BannerKind = 'plain' | 'win' | 'lose';
 
@@ -20,15 +21,6 @@ export interface BannerCopy {
   readonly duration: number;
 }
 
-export interface ToastCopy {
-  readonly title: string;
-  readonly tag: string;
-  readonly body: string;
-  readonly result: string;
-  readonly tone: Tone;
-  readonly seal: string;
-}
-
 export interface GameOverCopy {
   readonly winner: Side;
   readonly title: string;
@@ -37,7 +29,8 @@ export interface GameOverCopy {
 
 export type Notice =
   | { readonly kind: 'banner'; readonly banner: BannerCopy; readonly announcement: string }
-  | { readonly kind: 'toast'; readonly toast: ToastCopy; readonly announcement: string }
+  | { readonly kind: 'headline'; readonly headline: HeadlineCopy; readonly announcement: string }
+  | { readonly kind: 'mark'; readonly mark: MarkCopy; readonly announcement: string }
   | { readonly kind: 'strip'; readonly side: Side }
   | {
       readonly kind: 'reveal';
@@ -86,10 +79,18 @@ export const bannerNotice = (banner: BannerCopy, preface = ''): Notice => ({
   announcement: `${preface}${banner.title}${banner.subtitle === '' ? '' : `. ${banner.subtitle}`}`,
 });
 
-export const toastNotice = (toast: ToastCopy): Notice => ({
-  kind: 'toast',
-  toast,
-  announcement: `${toast.title}. ${[toast.body, toast.result].filter(Boolean).join('. ')}`,
+export const headlineNotice = (headline: HeadlineCopy): Notice => ({
+  kind: 'headline',
+  headline,
+  announcement: spoken(headline.title, headline.body, headline.result),
+});
+
+export const sheetNotice = (fields: SheetFields): Notice => headlineNotice(sheet(fields));
+
+export const markNotice = (mark: MarkCopy): Notice => ({
+  kind: 'mark',
+  mark,
+  announcement: spoken(mark.title, mark.detail),
 });
 
 export const announceNotice = (announcement: string): Notice => ({

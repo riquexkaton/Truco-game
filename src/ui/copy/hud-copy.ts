@@ -25,13 +25,24 @@ export const HUD_LABELS = {
   actions: 'Jugadas',
   yourTurn: 'TU TURNO',
   theirTurn: 'SU TURNO',
+  paused: 'EN PAUSA',
   restart: 'OTRA PARTIDA',
   curse: 'Maldición: su próxima carta tiene −4',
   curseMark: '−4',
   seal: 'Sello: su próximo efecto queda anulado',
 };
 
-export const WAGER_COPY = { lower: 'Bajar', raise: 'Subir' };
+export const WAGER_COPY = { lower: 'Bajar apuesta', raise: 'Subir apuesta' };
+
+export const RAISE_COPY = { back: 'VOLVER', backLabel: 'Volver a las respuestas' };
+
+export const CONTINUE_COPY = {
+  touch: 'TOCA PARA SEGUIR',
+  click: 'CLIC O',
+  key: 'ESPACIO',
+  after: 'PARA SEGUIR',
+  label: 'Toca, haz clic o pulsa Espacio para seguir.',
+};
 
 export const stripCopy = (side: Side, turnSeconds: number): StripCopy => ({
   title: bySide(side, 'TU TURNO', 'TURNO DEL RIVAL'),

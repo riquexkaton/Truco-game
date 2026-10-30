@@ -3,8 +3,9 @@ import type { Side } from '@domain/shared/side';
 
 import type { GameEventOf } from '@application/ports/game-event';
 
+import { sheet } from '@ui/copy/headline';
 import type { NoticeBuilders } from '@ui/copy/notice';
-import { bannerCopy, bannerNotice } from '@ui/copy/notice';
+import { bannerCopy, bannerNotice, headlineNotice } from '@ui/copy/notice';
 import { bySide, MINUS, num, plural, roman } from '@ui/copy/text';
 
 type RoundNotices = Pick<
@@ -14,36 +15,44 @@ type RoundNotices = Pick<
 
 const roundEndedNotice = ({ winner, stake }: GameEventOf<'roundEnded'>) => {
   if (winner === null) {
-    return bannerNotice(bannerCopy('RONDA EMPATADA', 'NADIE RECIBE DAÑO', { duration: 1300 }));
+    return headlineNotice(
+      sheet({ seal: '=', tone: 'tie', title: 'RONDA EMPATADA', result: 'NADIE RECIBE DAÑO' }),
+    );
   }
   const amount = num(stake);
-  return bannerNotice(
-    bannerCopy(
-      bySide(winner, 'GANAS LA RONDA', 'PIERDES LA RONDA'),
-      bySide(winner, `EL RIVAL PIERDE ${amount}`, `PIERDES ${amount} DE VIDA`),
-      {
-        duration: 1400,
-        kind: bySide(winner, 'win', 'lose'),
-        seal: { value: amount, caption: 'VALÍA' },
-      },
-    ),
+  return headlineNotice(
+    sheet({
+      seal: `${MINUS}${amount}`,
+      tone: bySide(winner, 'win', 'lose'),
+      title: bySide(winner, 'GANAS LA RONDA', 'PIERDES LA RONDA'),
+      result: bySide(winner, `EL RIVAL PIERDE ${amount}`, `PIERDES ${amount} DE VIDA`),
+    }),
   );
 };
 
-const retiredTitle = ({ side, reason }: GameEventOf<'retired'>): string =>
-  reason === 'fold' ? 'TE VAS' : bySide(side, 'TE RETIRAS', 'EL RIVAL SE RETIRA');
+const RETIRED_LINES = {
+  fold: {
+    title: (side: Side) => bySide(side, 'TE VAS', 'EL RIVAL SE VA'),
+    body: (side: Side) => bySide(side, 'Abandonas la ronda.', 'El rival abandona la ronda.'),
+  },
+  retire: {
+    title: (side: Side) => bySide(side, 'TE RETIRAS', 'EL RIVAL SE RETIRA'),
+    body: (side: Side) => bySide(side, 'No aceptas el Desafío.', 'El rival no acepta tu Desafío.'),
+  },
+};
 
-const retiredNotice = (event: GameEventOf<'retired'>) => {
-  const damage = num(event.damage);
-  return bannerNotice(
-    bannerCopy(
-      retiredTitle(event),
-      bySide(event.side, `PIERDES ${damage} DE VIDA`, `EL RIVAL PIERDE ${damage}`),
-      {
-        kind: bySide(event.side, 'lose', 'win'),
-        seal: { value: `${MINUS}${damage}`, caption: '' },
-      },
-    ),
+const retiredNotice = ({ side, damage, reason }: GameEventOf<'retired'>) => {
+  const amount = num(damage);
+  const lines = RETIRED_LINES[reason];
+  return headlineNotice(
+    sheet({
+      isRival: side === 'rival',
+      seal: `${MINUS}${amount}`,
+      tone: bySide(side, 'lose', 'win'),
+      title: lines.title(side),
+      body: lines.body(side),
+      result: bySide(side, `PIERDES ${amount} DE VIDA`, `EL RIVAL PIERDE ${amount}`),
+    }),
   );
 };
 

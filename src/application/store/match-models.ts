@@ -23,6 +23,7 @@ export interface MatchModels {
   readonly ritualSung: ReadonlySignal<boolean>;
   readonly turnSide: ReadonlySignal<Side | null>;
   readonly isTurnLow: ReadonlySignal<boolean>;
+  readonly isTurnPaused: ReadonlySignal<boolean>;
 }
 
 const NO_MARKS = bothSides(false);
@@ -41,6 +42,9 @@ const turnSideOf = (signals: GameSignals): Side | null => {
   return phase === 'player' && !state.roundOver ? 'player' : null;
 };
 
+const isTurnPausedOf = (signals: GameSignals): boolean =>
+  turnSideOf(signals) === 'player' && (signals.prompting.value || signals.announcing.value > 0);
+
 export const createMatchModels = (signals: GameSignals): MatchModels => ({
   lives: fromMatch(signals, (state) => state.lives, fullLives()),
   duelResults: fromMatch<readonly DuelResult[]>(signals, (state) => state.results, []),
@@ -56,4 +60,5 @@ export const createMatchModels = (signals: GameSignals): MatchModels => ({
   ritualSung: fromMatch(signals, (state) => state.ritual.sung, false),
   turnSide: computed(() => turnSideOf(signals)),
   isTurnLow: computed(() => signals.turnSecondsLeft.value <= LOW_TURN_SECONDS),
+  isTurnPaused: computed(() => isTurnPausedOf(signals)),
 });

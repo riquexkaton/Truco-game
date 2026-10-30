@@ -12,7 +12,6 @@ const revealPendingPact = async (game: GameContext): Promise<void> => {
   const revealed = revealPact(state);
   await commit(game, beforeLifeChange(revealed, state));
   await announce(game, { type: 'pactRevealed', ...pending });
-  await pause(game, PACT_REVEAL_MS);
   await commit(game, revealed);
   await pause(game, PACT_REVEAL_MS);
 };

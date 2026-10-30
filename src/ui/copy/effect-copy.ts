@@ -16,6 +16,14 @@ export const EFFECT_COPY: Readonly<Record<EffectId, EffectCopy>> = {
   sello: { name: 'SELLO', description: 'Anula el próximo efecto del rival.' },
 };
 
+export const RIVAL_EFFECT_COPY: Readonly<Record<EffectId, string>> = {
+  golpe: 'El rival te golpea: recibes 2 de daño.',
+  sanacion: 'El rival recupera 2 de vida.',
+  saqueo: 'El rival te roba una carta al azar y te da una suya.',
+  maldicion: 'El rival te maldice: tu próxima carta tiene −4 de ataque.',
+  sello: 'El rival sella: tu próximo efecto queda anulado.',
+};
+
 export const effectLabel = (effect: EffectId): string =>
   `${EFFECT_COPY[effect].name}: ${EFFECT_COPY[effect].description}`;
 

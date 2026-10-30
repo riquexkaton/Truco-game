@@ -27,6 +27,7 @@ const TurnSignalsContainer = ({ store, isMenuOpen }: TurnSignalsProps) => {
       <TurnBar
         isActive={isPlayerTurn}
         isConcealed={isMenuOpen}
+        isPaused={store.isTurnPaused.value}
         isLow={isLow}
         secondsLeft={secondsLeft}
         totalSeconds={store.turnSeconds}

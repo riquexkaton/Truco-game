@@ -56,6 +56,7 @@ export interface PactAnswerQuestion extends TimedQuestion<'pactAnswer'> {
 
 interface FoldQuestion {
   readonly kind: 'foldConfirm';
+  readonly damage: number;
 }
 
 interface DiscardQuestion {
