@@ -42,7 +42,7 @@ const mount = (model: ActionBarModel) => {
   return handlers;
 };
 
-const cantar = () => screen.getByRole('button', { name: 'Cantar: Procesión, Llama o Desafío' });
+const cantar = () => screen.getByRole('button', { name: 'Clamar: Procesión, Llama o Desafío' });
 
 afterEach(() => {
   cleanup();
@@ -67,12 +67,12 @@ describe('the action bar', () => {
     ).toBeTruthy();
   });
 
-  it('opens the Cantar menu and reflects it in aria-expanded', () => {
+  it('opens the Clamar menu and reflects it in aria-expanded', () => {
     mount(modelWith());
     expect(cantar().getAttribute('aria-expanded')).toBe('false');
     fireEvent.click(cantar());
     expect(cantar().getAttribute('aria-expanded')).toBe('true');
-    expect(screen.getByRole('menu', { name: 'Cantar' })).toBeTruthy();
+    expect(screen.getByRole('menu', { name: 'Clamar' })).toBeTruthy();
     expect(screen.getAllByRole('menuitem')).toHaveLength(2);
   });
 

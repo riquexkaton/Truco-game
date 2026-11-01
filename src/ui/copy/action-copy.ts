@@ -20,9 +20,9 @@ export const FOLD_COPY = {
 };
 
 export const CANTAR_COPY = {
-  label: 'CANTAR',
-  description: 'Cantar: Procesión, Llama o Desafío',
-  menu: 'Cantar',
+  label: 'CLAMAR',
+  description: 'Clamar: Procesión, Llama o Desafío',
+  menu: 'Clamar',
   ready: 'Procesión lista',
 };
 
