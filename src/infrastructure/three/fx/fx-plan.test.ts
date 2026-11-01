@@ -1,63 +1,50 @@
 import { describe, expect, it } from 'vitest';
 
 import { duelLooks } from '@infrastructure/three/cards/duel-look';
-import { EMBER_COUNT, emberSeeds } from '@infrastructure/three/fx/ember-seeds';
 import {
   duelFx,
-  FX_SECONDS,
-  fxProgress,
+  FX_FADE_OUT,
   isFxOver,
   SMOKE_TIMING,
+  STILL_BURNING,
 } from '@infrastructure/three/fx/fx-plan';
 
-const emberEnds = (random: () => number): number[] => {
-  const { motions } = emberSeeds(random);
-  return Array.from({ length: EMBER_COUNT }, (_, index) => {
-    const [delay = 0, life = 0] = motions.subarray(index * 4, index * 4 + 2);
-    return delay + life;
-  });
-};
-
-describe('smoke and embers after a duel', () => {
-  it('raises smoke from the loser and embers from the winner', () => {
-    expect(duelFx(duelLooks('player'), false)).toEqual({ player: 'embers', rival: 'smoke' });
-    expect(duelFx(duelLooks('rival'), false)).toEqual({ player: 'smoke', rival: 'embers' });
+describe('smoke and vines after a duel', () => {
+  it('raises smoke from the loser and grows vines under the winner', () => {
+    expect(duelFx(duelLooks('player'), false)).toEqual({ player: 'vines', rival: 'smoke' });
+    expect(duelFx(duelLooks('rival'), false)).toEqual({ player: 'smoke', rival: 'vines' });
   });
 
-  it('gives a tie neither smoke nor embers', () => {
+  it('gives a tie neither smoke nor vines', () => {
     expect(duelFx(duelLooks('tie'), false)).toEqual({ player: null, rival: null });
+    expect(duelFx(duelLooks('tie'), true)).toEqual({ player: null, rival: null });
   });
 
-  it('plays nothing under reduced motion', () => {
-    expect(duelFx(duelLooks('player'), true)).toEqual({ player: null, rival: null });
-    expect(duelFx(duelLooks('rival'), true)).toEqual({ player: null, rival: null });
+  it('keeps the still vines under reduced motion but drops the moving smoke', () => {
+    expect(duelFx(duelLooks('player'), true)).toEqual({ player: 'vines', rival: null });
+    expect(duelFx(duelLooks('rival'), true)).toEqual({ player: null, rival: 'vines' });
   });
 
-  it('runs for 2.8 s from the resolution and then stops', () => {
-    expect(FX_SECONDS).toBeCloseTo(2.8);
-    expect(fxProgress(0)).toBe(0);
-    expect(fxProgress(1.4)).toBeCloseTo(0.5);
-    expect(fxProgress(-1)).toBe(0);
-    expect(isFxOver(2.7)).toBe(false);
-    expect(isFxOver(FX_SECONDS)).toBe(true);
-    expect(isFxOver(9)).toBe(true);
-  });
-
-  it('fades the smoke in fast and out slowly, before the effect ends', () => {
-    const fadeOut = FX_SECONDS - SMOKE_TIMING.fadeOutFrom;
-    expect(SMOKE_TIMING.fadeIn).toBeLessThan(fadeOut / 4);
-    expect(SMOKE_TIMING.emitFor).toBeLessThan(FX_SECONDS);
-  });
-
-  it('staggers a burst of embers that all burn out within the effect', () => {
-    expect(EMBER_COUNT).toBeGreaterThanOrEqual(16);
-    expect(EMBER_COUNT).toBeLessThanOrEqual(24);
-    for (const random of [() => 0, () => 0.5, () => 0.999]) {
-      for (const end of emberEnds(random)) {
-        expect(end).toBeLessThanOrEqual(FX_SECONDS);
-      }
+  it('keeps both effects for as long as the cards stay on the table', () => {
+    for (const clock of [0, 2.8, 30, 600]) {
+      expect(isFxOver(STILL_BURNING, clock)).toBe(false);
     }
-    const [first = 0, ...rest] = emberEnds(() => 0.5);
-    expect(Math.max(...rest)).toBeGreaterThan(first + 1);
+  });
+
+  it('lets both effects fade away softly once the table is cleared', () => {
+    const snuffedAt = 42;
+    expect(isFxOver(snuffedAt, snuffedAt)).toBe(false);
+    expect(isFxOver(snuffedAt, snuffedAt + FX_FADE_OUT * 0.9)).toBe(false);
+    expect(isFxOver(snuffedAt, snuffedAt + FX_FADE_OUT * 1.01)).toBe(true);
+    expect(SMOKE_TIMING.fadeOut).toBe(FX_FADE_OUT);
+    expect(FX_FADE_OUT).toBeGreaterThanOrEqual(1);
+    expect(FX_FADE_OUT).toBeLessThanOrEqual(2);
+  });
+
+  it('fades the smoke in softly while the column climbs off the card', () => {
+    expect(SMOKE_TIMING.fadeIn).toBeGreaterThanOrEqual(0.3);
+    expect(SMOKE_TIMING.fadeIn).toBeLessThan(SMOKE_TIMING.fadeOut);
+    expect(1 / SMOKE_TIMING.rise).toBeGreaterThan(1);
+    expect(1 / SMOKE_TIMING.rise).toBeLessThan(3);
   });
 });

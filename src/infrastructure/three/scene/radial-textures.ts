@@ -15,7 +15,6 @@ export interface RadialTextures {
   readonly halo: CanvasTexture;
   readonly blob: CanvasTexture;
   readonly glare: CanvasTexture;
-  readonly glow: CanvasTexture;
 }
 
 const HALO: RadialSpec = {
@@ -45,16 +44,6 @@ const GLARE: RadialSpec = {
     [0, 'rgba(255,236,200,0.9)'],
     [0.35, 'rgba(255,214,160,0.35)'],
     [1, 'rgba(255,200,140,0)'],
-  ],
-};
-
-const GLOW: RadialSpec = {
-  size: 256,
-  inset: 2,
-  stops: [
-    [0, 'rgba(255,255,255,1)'],
-    [0.55, 'rgba(255,255,255,0.37)'],
-    [1, 'rgba(255,255,255,0)'],
   ],
 };
 
@@ -89,5 +78,4 @@ export const createRadialTextures = (kit: TextureKit): RadialTextures => ({
   halo: radialTexture(kit, HALO),
   blob: radialTexture(kit, BLOB),
   glare: radialTexture(kit, GLARE),
-  glow: radialTexture(kit, GLOW),
 });

@@ -6,7 +6,6 @@ import type { PerSide, Side } from '@domain/shared/side';
 
 import type { RoundDeal } from '@application/ports/table-port';
 
-import { resetGlows } from '@infrastructure/three/cards/duel-glows';
 import { calmCard, placeCardAt } from '@infrastructure/three/cards/card-motion';
 import { showCardFace, tableCardOf } from '@infrastructure/three/cards/table-deck';
 import type { HandSlot } from '@infrastructure/three/layout/hand-poses';
@@ -82,7 +81,6 @@ const dealToHands = async (stage: Stage, deal: RoundDeal): Promise<void> => {
 };
 
 export const dealRound = async (stage: Stage, deal: RoundDeal): Promise<void> => {
-  resetGlows(stage.glows);
   const artReady = stage.art.ensure([...deal.player, ...deal.rival]);
   await revealVira(stage, deal.vira);
   await artReady;

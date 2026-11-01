@@ -7,7 +7,6 @@ import { SIDES } from '@domain/shared/side';
 import type { DuelMark } from '@application/ports/table-port';
 
 import { setBadgeLevel, showBadge } from '@infrastructure/three/cards/duel-badges';
-import { lightGlow, resetGlows } from '@infrastructure/three/cards/duel-glows';
 import type { CardLook } from '@infrastructure/three/cards/duel-look';
 import {
   advanceMark,
@@ -55,16 +54,8 @@ export const markDuelOnTable = (stage: Stage, mark: DuelMark): void => {
     looks,
     progress: 0,
   });
-  for (const side of SIDES) {
-    lightGlow(stage.glows, { duel: mark.duel, side, level: traitAt(looks[side], 'pool', 1) });
-  }
   markBadges(stage, mark, ids);
-  startDuelFx(stage.duelMarks.fx, {
-    duel: mark.duel,
-    looks,
-    isReduced: stage.reducedMotion,
-    pixelRatio: stage.renderer.getPixelRatio(),
-  });
+  startDuelFx(stage.duelMarks.fx, { duel: mark.duel, looks, isReduced: stage.reducedMotion });
 };
 
 const tintCard = ({ tint }: TableCard, look: CardLook, progress: number): void => {
@@ -91,5 +82,4 @@ export const updateDuelMarks = (stage: Stage, deltaSeconds: number): void => {
 
 export const clearDuelMarks = (stage: Stage): void => {
   unmarkDuels(stage.duelMarks);
-  resetGlows(stage.glows);
 };

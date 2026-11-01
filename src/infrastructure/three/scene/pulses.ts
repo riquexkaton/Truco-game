@@ -12,6 +12,3 @@ export const backgroundFlicker = (noise: number): BackgroundFlicker => ({
   base: 1 + noise * 0.12,
   left: 1 + noise * 0.45,
 });
-
-export const glowLevel = (isLit: boolean, time: number): number =>
-  isLit ? 0.75 + Math.sin(time * 2.2) * 0.12 : 0;

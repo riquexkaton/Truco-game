@@ -14,6 +14,7 @@ import type { CardLook } from '@infrastructure/three/cards/duel-look';
 import type { TableCard } from '@infrastructure/three/cards/table-card';
 import type { DuelFx } from '@infrastructure/three/fx/duel-fx';
 import { clearDuelFx, createDuelFx } from '@infrastructure/three/fx/duel-fx';
+import { disposeVines } from '@infrastructure/three/fx/vine-decals';
 import type { TextureKit } from '@infrastructure/three/textures/canvas-texture';
 
 export interface MarkedDuel {
@@ -48,4 +49,5 @@ export const unmarkDuels = (marks: DuelMarks): void => {
 
 export const disposeDuelMarks = (marks: DuelMarks): void => {
   disposeDuelBadges(marks.badges);
+  disposeVines(marks.fx.vines);
 };

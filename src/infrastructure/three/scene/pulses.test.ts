@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { backgroundFlicker, candleNoise, glowLevel } from '@infrastructure/three/scene/pulses';
+import { backgroundFlicker, candleNoise } from '@infrastructure/three/scene/pulses';
 
 describe('candleNoise', () => {
   it('stays within the sum of its three waves', () => {
@@ -23,16 +23,5 @@ describe('backgroundFlicker', () => {
     const flicker = backgroundFlicker(0.1);
     expect(flicker.base).toBeCloseTo(1.012);
     expect(flicker.left).toBeCloseTo(1.045);
-  });
-});
-
-describe('glowLevel', () => {
-  it('is dark when the duel slot is not lit', () => {
-    expect(glowLevel(false, 3)).toBe(0);
-  });
-
-  it('breathes around 0.75 when lit', () => {
-    expect(glowLevel(true, 0)).toBe(0.75);
-    expect(glowLevel(true, Math.PI / 4.4)).toBeCloseTo(0.87);
   });
 });

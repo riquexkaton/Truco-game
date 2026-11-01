@@ -17,7 +17,7 @@ Bajar la vida del campeón rival de **20 a 0**.
 | Mazo            | Cartas                | Para qué sirve                                       |
 | --------------- | --------------------- | ---------------------------------------------------- |
 | Mazo de juego   | 40 (4 facciones × 10) | Las cartas que se juegan en los duelos               |
-| Mazo de viras   | 4 (una por facción)   | Define qué facción está "encendida" en cada ronda    |
+| Mazo de velas   | 4 (una por facción)   | Define qué facción está "encendida" en cada ronda    |
 | Mazo de efectos | 20                    | Efectos especiales que se ganan con cartas con sello |
 
 ### Facciones (nombres provisionales)
@@ -36,23 +36,23 @@ Bajar la vida del campeón rival de **20 a 0**.
 - Cada carta tiene un **número de ataque** visible. Gana el más alto; no hay jerarquía que memorizar.
 - **Cartas normales:** ataque del 1 al 10.
 - **Legendarias:** ataque 11–12. La más fuerte de las fijas es el **1 de Espadas (12)**.
-- **Perico y Perica:** cada facción tiene uno de cada uno. Su valor depende de la vira:
+- **Velador y Veladora:** cada facción tiene uno de cada uno. Su valor depende de la vela:
 
-| Carta  | Inactiva (vira de otra facción) | Activa (vira de su facción) |
-| ------ | ------------------------------- | --------------------------- |
-| Perico | 6                               | 15                          |
-| Perica | 5                               | 14                          |
+| Carta    | Dormidos (vela de otra facción) | Despiertos (vela de su facción) |
+| -------- | ------------------------------- | ------------------------------- |
+| Velador  | 6                               | 15                              |
+| Veladora | 5                               | 14                              |
 
-Activos, el Perico y la Perica son las cartas más fuertes del juego, por encima de cualquier legendaria. Inactivos, se juegan como cartas normales.
+Despiertos, el Velador y la Veladora son las cartas más fuertes del juego, por encima de cualquier legendaria. Dormidos, se juegan como cartas normales.
 
 ### Cartas con sello
 
 Las cartas con sello son las que permiten tomar cartas de efecto. Llevan un sello visible en la carta.
 
-- Perico y Perica **activos**
+- Velador y Veladora **despiertos**
 - Legendarias
 
-Un Perico o una Perica inactivos **no** cuentan como carta con sello.
+Un Velador o una Veladora dormidos **no** cuentan como carta con sello.
 
 ---
 
@@ -69,7 +69,7 @@ Un Perico o una Perica inactivos **no** cuentan como carta con sello.
 ## 5. Cómo se juega una ronda
 
 1. Cada jugador recibe **3 cartas** del mazo de juego.
-2. Se revela una carta del **mazo de viras**. El Perico y la Perica de esa facción quedan **activos** durante la ronda.
+2. Se enciende una carta del **mazo de velas** («se enciende la vela del Lirio»). El Velador y la Veladora de esa facción quedan **despiertos** durante la ronda.
 3. Se juegan **3 duelos**: cada jugador pone una carta y gana la de mayor ataque.
 4. Quien gane **2 duelos** gana la ronda.
 5. El ganador de la ronda le hace daño al campeón rival.
@@ -106,7 +106,7 @@ En su turno, un jugador puede decir **"Desafío"**. El rival elige:
 | Retirarse       | Pierde la ronda y recibe **1 de daño**                                                                         |
 | Contra-desafiar | La ronda ahora hace **6 de daño**; quien desafió primero debe aceptar o retirarse (si se retira, recibe **4**) |
 
-Como la vira se ve desde el inicio de la ronda, ambos jugadores saben qué facción está encendida. Desafiar es la forma de farolear: ¿tienes el Perico activo o no?
+Como la vela se ve desde el inicio de la ronda, ambos jugadores saben qué facción está encendida. Desafiar es la forma de farolear: ¿tienes el Velador despierto o no?
 
 ### Tener la palabra
 
@@ -122,7 +122,7 @@ En su turno, un jugador puede decir **"Me voy"** (como irse al mazo en el truco)
 
 - Abandona la ronda: el rival la gana.
 - Quien se va pierde lo que vale la ronda, como en el truco: **4** si se aceptó un Desafío y **6** si se aceptó un contra-desafío. Sin Desafío aceptado, recibe **1 de daño**. Vale igual para quien subió la apuesta.
-- Si había un Pacto aceptado, se sigue revelando al final de la ronda y su daño se aplica igual.
+- Si había una Llama aceptada, se sigue revelando al final de la ronda y su daño se aplica igual.
 
 ---
 
@@ -132,9 +132,9 @@ En su turno, un jugador puede decir **"Me voy"** (como irse al mazo en el truco)
 
 Cuando **ganas un duelo con una carta con sello**, tomas una carta del mazo de efectos. No hace falta ganar la ronda.
 
-**Ejemplo:** la vira es de Copas. El rival juega un 9 y tú lo matas con la Perica de Copas (14). Ganas ese duelo y tomas una carta de efecto en ese momento.
+**Ejemplo:** la vela es de Copas. El rival juega un 9 y tú lo matas con la Veladora de Copas (14). Ganas ese duelo y tomas una carta de efecto en ese momento.
 
-Que una carta tenga sello depende de la carta, no de su ataque final: un Perico activo con Maldición que igual gana el duelo sigue dando efecto.
+Que una carta tenga sello depende de la carta, no de su ataque final: un Velador despierto con Maldición que igual gana el duelo sigue dando efecto.
 
 ### Cómo se guardan
 
@@ -165,7 +165,7 @@ Que una carta tenga sello depende de la carta, no de su ataque final: un Perico 
 - Es un **intercambio**: ambos jugadores mantienen la misma cantidad de cartas, así que la ronda siempre puede jugarse completa.
 - La carta que robas es **al azar**; la que entregas la **eliges tú**.
 - Solo se puede usar si el rival todavía tiene al menos una carta en la mano.
-- Si robas un Perico o una Perica activos, siguen activos en tu mano: la vira activa a la facción, no al jugador.
+- Si robas un Velador o una Veladora despiertos, siguen despiertos en tu mano: la vela despierta a la facción, no al jugador.
 - Combo posible: robar una carta con sello, jugarla, ganar el duelo y tomar otro efecto. Es válido; depende del azar del robo.
 
 ### Detalles del Golpe y la Sanación
@@ -187,15 +187,15 @@ Que una carta tenga sello depende de la carta, no de su ataque final: un Perico 
 
 ---
 
-## 8. Pacto y Ritual (capa avanzada)
+## 8. Llama y Procesión (capa avanzada)
 
 Apuestas paralelas a los duelos, inspiradas en el envido y la flor. Se desbloquean más adelante en la campaña (ver sección 9).
 
-### Pacto (envido)
+### Llama (envido)
 
-Se calcula con la regla del envido del truco, para que una mano fuerte en los duelos no tenga por fuerza un Pacto fuerte (y al revés).
+Se calcula con la regla del envido del truco, para que una mano fuerte en los duelos no tenga por fuerza una Llama fuerte (y al revés).
 
-**Cuánto vale tu Pacto:**
+**Cuánto vale tu Llama:**
 
 | Cartas                                                          | Valor                        |
 | --------------------------------------------------------------- | ---------------------------- |
@@ -204,42 +204,42 @@ Se calcula con la regla del envido del truco, para que una mano fuerte en los du
 | **Dos cartas de la misma facción**                              | La suma de las dos **+ 20**  |
 | Sin dos cartas de la misma facción                              | La carta más alta (sin bono) |
 
-- Se usa el ataque base impreso: el Perico cuenta como **6** y la Perica como **5**, aunque estén activos.
+- Se usa el ataque base impreso: el Velador cuenta como **6** y la Veladora como **5**, aunque estén despiertos.
 - Con 3 cartas de la misma facción se cuentan las 2 mejores.
-- El máximo es **37** (un 9 y un 8 de la misma facción). Sin pareja, el Pacto va de 0 a 9.
+- El máximo es **37** (un 9 y un 8 de la misma facción). Sin pareja, la Llama va de 0 a 9.
 
 **Ejemplos:**
 
-- Baltasar (12, Carnero) + Oriana (11, Cayado) + Sor Irene (2, Velo): gana casi seguro los duelos, pero su Pacto vale **2** (las figuras valen 0 y no hay pareja de facción).
-- Baltasar (12) + Garín (10), los dos de Carnero: pareja de figuras, Pacto **20**.
-- Un 5 y un 3 de la misma facción: casi no ganan duelos, pero su Pacto vale **28**.
+- Baltasar (12, Carnero) + Oriana (11, Cayado) + Sor Irene (2, Velo): gana casi seguro los duelos, pero su Llama vale **2** (las figuras valen 0 y no hay pareja de facción).
+- Baltasar (12) + Garín (10), los dos de Carnero: pareja de figuras, Llama **20**.
+- Un 5 y un 3 de la misma facción: casi no ganan duelos, pero su Llama vale **28**.
 
-**Cómo se canta:**
+**Cómo se enciende:**
 
-1. Solo se puede cantar en tu turno, **antes de jugar tu carta del primer duelo**.
+1. Solo se puede encender la Llama en tu turno, **antes de jugar tu carta del primer duelo**.
 2. Hay tres apuestas, como envido, real envido y falta envido:
 
-| Apuesta  | Quien pierda el Pacto recibe                                                                            |
-| -------- | ------------------------------------------------------------------------------------------------------- |
-| Pacto    | **2** de daño                                                                                           |
-| Re-pacto | **4** de daño                                                                                           |
-| Apuesta  | Un número elegido: de **4** (o uno más que la apuesta anterior) hasta **la vida que le queda al rival** |
+| Apuesta | Quien pierda la Llama recibe                                                                                                                 |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Llama   | **2** de daño                                                                                                                                |
+| Avivar  | **4** de daño                                                                                                                                |
+| Apuesta | Un número elegido: de **4** (o uno más que la apuesta anterior) hasta **la vida que le queda al rival** (el botón «A MUERTE» pone el máximo) |
 
-3. Quien responde puede **aceptar**, **rechazar** o **subir** a una apuesta mayor. Las subidas siguen hasta que alguien acepte o rechace.
+3. Quien responde puede **aceptar**, **rechazar** o **subir** a una apuesta mayor (avivar la Llama o apostar más). Las subidas siguen hasta que alguien acepte o rechace.
 4. Si **rechaza**, recibe el daño de la apuesta anterior (1 si rechaza la primera).
-5. Si **acepta**, el resultado se fija en ese momento, pero **el ganador se revela al final de la ronda**. Quien tenga menos Pacto recibe el daño apostado.
+5. Si **acepta**, el resultado se fija en ese momento, pero **el ganador se revela al final de la ronda**. Quien tenga menos Llama recibe el daño apostado.
 6. Empate: gana quien empezó la ronda.
 
-- El Pacto ya no cura: el que pierde recibe daño.
-- En digital, cada jugador ve solo su propio valor de Pacto; el del rival no se muestra.
+- La Llama ya no cura: el que pierde recibe daño.
+- En digital, cada jugador ve solo su propia Llama; la del rival no se muestra.
 
-### Ritual (flor)
+### Procesión (flor)
 
-- Si tus **3 cartas son de la misma facción**, tienes Ritual.
-- **Hay que cantarlo**, antes de jugar tu primera carta de la ronda. Si juegas sin cantarlo, **lo pierdes**.
-- Al cantarlo, el rival recibe **3 de daño** y tú tomas **1 carta de efecto** (aplican las reglas normales de guardado).
-- El Ritual **anula el Pacto**: si te cantan Pacto y tienes Ritual, puedes responder cantándolo y el Pacto se cancela. Después de un Ritual no se puede cantar Pacto en esa ronda.
-- Es raro: sale en aproximadamente el 5% de las manos.
+- Si tus **3 cartas son de la misma facción**, tienes Procesión.
+- **Hay que sacarla**, antes de jugar tu primera carta de la ronda. Si juegas sin sacarla, **la pierdes**.
+- Al sacarla, el rival recibe **3 de daño** y tú tomas **1 carta de efecto** (aplican las reglas normales de guardado).
+- La Procesión **anula la Llama**: si te encienden la Llama y tienes Procesión, puedes responder sacándola y la Llama se cancela. Después de una Procesión no se puede encender la Llama en esa ronda.
+- Es rara: sale en aproximadamente el 5% de las manos.
 
 ---
 
@@ -247,13 +247,13 @@ Se calcula con la regla del envido del truco, para que una mano fuerte en los du
 
 El juego se enseña jugando, sin manual: como en Overcooked, cada etapa de la campaña introduce **una sola mecánica nueva** y la complejidad sube poco a poco. Al terminar la campaña, el jugador ya juega con todas las reglas.
 
-| Etapa | Se introduce                   | Cómo se enseña                                                                               |
-| ----- | ------------------------------ | -------------------------------------------------------------------------------------------- |
-| 1     | Duelos y ataque                | Manos fijas: el jugador aprende que el número más alto gana y que se necesitan 2 de 3 duelos |
-| 2     | La vira, el Perico y la Perica | El rival tiene cartas altas; solo se le gana activando el Perico con la vira correcta        |
-| 3     | Desafío y retirarse            | El rival desafía con manos débiles: el jugador aprende a detectar el farol y a farolear      |
-| 4     | Cartas con sello y efectos     | Se introducen Golpe y Sanación primero; luego Maldición, Saqueo y Sello                      |
-| 5     | Pacto y Ritual                 | Se activan las apuestas paralelas                                                            |
+| Etapa | Se introduce                      | Cómo se enseña                                                                               |
+| ----- | --------------------------------- | -------------------------------------------------------------------------------------------- |
+| 1     | Duelos y ataque                   | Manos fijas: el jugador aprende que el número más alto gana y que se necesitan 2 de 3 duelos |
+| 2     | La vela, el Velador y la Veladora | El rival tiene cartas altas; solo se le gana despertando al Velador con la vela correcta     |
+| 3     | Desafío y retirarse               | El rival desafía con manos débiles: el jugador aprende a detectar el farol y a farolear      |
+| 4     | Cartas con sello y efectos        | Se introducen Golpe y Sanación primero; luego Maldición, Saqueo y Sello                      |
+| 5     | Llama y Procesión                 | Se activan las apuestas paralelas                                                            |
 
 **Principios de diseño de cada etapa:**
 
@@ -266,18 +266,19 @@ El juego se enseña jugando, sin manual: como en Overcooked, cada etapa de la ca
 
 ## 10. Equivalencias con el truco
 
-| Truco                                   | Este juego                                                   |
-| --------------------------------------- | ------------------------------------------------------------ |
-| Cada jugada (primera, segunda, tercera) | Duelo                                                        |
-| La mano de 3 cartas                     | Ronda                                                        |
-| Truco / retruco                         | Desafío / Contra-desafío                                     |
-| No quiero                               | Retirarse                                                    |
-| Irse al mazo                            | Me voy (−1 de vida, o lo que vale la ronda si hay Desafío)   |
-| Envido / real envido / falta envido     | Pacto / Re-pacto / Apuesta (figuras valen 0, +20 por pareja) |
-| Flor                                    | Ritual (hay que cantarlo)                                    |
-| Vira (una de las 40 cartas)             | Vira (mazo aparte, una por facción)                          |
-| Perico y perica                         | Perico y Perica, solo activos con la vira de su facción      |
-| Partida a puntos                        | Bajar la vida del campeón a 0                                |
+| Truco                                   | Este juego                                                                             |
+| --------------------------------------- | -------------------------------------------------------------------------------------- |
+| Cada jugada (primera, segunda, tercera) | Duelo                                                                                  |
+| La mano de 3 cartas                     | Ronda                                                                                  |
+| Truco / retruco                         | Desafío / Contra-desafío                                                               |
+| No quiero                               | Retirarse                                                                              |
+| Irse al mazo                            | Me voy (−1 de vida, o lo que vale la ronda si hay Desafío)                             |
+| Envido / real envido / falta envido     | Llama / Avivar / Apuesta, con «A MUERTE» como máximo (figuras valen 0, +20 por pareja) |
+| Cantar el envido                        | Encender la Llama                                                                      |
+| Flor                                    | Procesión (hay que sacarla)                                                            |
+| Vira (una de las 40 cartas)             | Vela (mazo de velas aparte, una por facción)                                           |
+| Perico y perica                         | Velador y Veladora, solo despiertos con la vela de su facción                          |
+| Partida a puntos                        | Bajar la vida del campeón a 0                                                          |
 
 ---
 
@@ -285,8 +286,8 @@ El juego se enseña jugando, sin manual: como en Overcooked, cada etapa de la ca
 
 - Si las cartas tendrán **vida propia** (quedarse en la mesa y recibir golpes) o solo ataque.
 - Valores exactos de ataque de cada carta y cuáles son legendarias además del 1 de Espadas.
-- Nombres finales de las facciones y de los términos (usar los del truco o propios).
-- Capas futuras: sinergias de facción, campeones con habilidad pasiva, viras especiales, construcción de mazo.
+- Nombres finales de las facciones.
+- Capas futuras: sinergias de facción, campeones con habilidad pasiva, velas especiales, construcción de mazo.
 - Formato: la campaña con progresión está decidida; falta definir si habrá 1v1 online después de la campaña.
 - Modos de juego (Rápido / Completo): descartados por ahora para no dividir a los jugadores online.
 - Probar si el Saqueo (intercambio) es demasiado fuerte con 3 copias; si lo es, bajar a 2.

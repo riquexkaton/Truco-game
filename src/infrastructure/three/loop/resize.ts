@@ -1,4 +1,5 @@
 import { relayoutCoins } from '@infrastructure/three/coins/coin-actions';
+import { fitVines } from '@infrastructure/three/fx/vine-decals';
 import { fitCamera, placeHandLight } from '@infrastructure/three/layout/camera-rig';
 import { backgroundUvRect, layoutFor } from '@infrastructure/three/layout/layouts';
 import { setBackgroundView } from '@infrastructure/three/scene/background';
@@ -17,6 +18,7 @@ export const resizeStage = (stage: Stage): void => {
   const layout = layoutFor(screenAspect);
   stage.layout = layout;
   relayoutCoins(stage.coins, layout.key);
+  fitVines(stage.duelMarks.fx.vines, layout.key);
   const view = fitCamera(stage.camera, { layout, screenAspect });
   setBackgroundView(stage.background, {
     map: stage.backgrounds[layout.key] ?? stage.backgrounds.wide,

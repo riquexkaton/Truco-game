@@ -1,63 +1,58 @@
-import type { Camera, Scene, WebGLRenderer } from 'three';
+import type { Scene } from 'three';
 import { Group } from 'three';
 
 import type { PerSide } from '@domain/shared/side';
 import { SIDES } from '@domain/shared/side';
 
 import type { CardLook } from '@infrastructure/three/cards/duel-look';
-import { createEmberSlots } from '@infrastructure/three/fx/ember-bursts';
 import type { DuelFxKind } from '@infrastructure/three/fx/fx-plan';
-import { duelFx, isFxOver } from '@infrastructure/three/fx/fx-plan';
+import { duelFx, isFxOver, STILL_BURNING } from '@infrastructure/three/fx/fx-plan';
 import type { FxSlot, NumberUniform } from '@infrastructure/three/fx/fx-slot';
 import { createSmokeSlots } from '@infrastructure/three/fx/smoke-wisps';
+import type { VineKit } from '@infrastructure/three/fx/vine-decals';
+import { createVineSlots, turnVine } from '@infrastructure/three/fx/vine-decals';
+import { vineTurn } from '@infrastructure/three/fx/vine-plan';
 import type { TablePoint } from '@infrastructure/three/layout/table-points';
-import { CARD_Y, slotPoint } from '@infrastructure/three/layout/table-points';
+import { slotPoint } from '@infrastructure/three/layout/table-points';
 
 export interface DuelFx {
   readonly group: Group;
   readonly clock: NumberUniform;
-  readonly emberSize: NumberUniform;
+  readonly vines: VineKit;
   readonly slots: Readonly<Record<DuelFxKind, readonly FxSlot[]>>;
   readonly every: readonly FxSlot[];
   live: number;
+  turns: number;
 }
 
 export interface DuelFxCue {
   readonly duel: number;
   readonly looks: PerSide<CardLook>;
   readonly isReduced: boolean;
-  readonly pixelRatio: number;
 }
 
-export interface FxView {
-  readonly renderer: WebGLRenderer;
-  readonly camera: Camera;
+interface FxPlace {
+  readonly duel: number;
+  readonly point: TablePoint;
 }
 
-const FX_LIFT = 0.03;
-const EMBER_PIXELS = 14;
+const TURN_VARIANTS = 4;
 
 export const createDuelFx = (scene: Scene): DuelFx => {
   const group = new Group();
   const clock = { value: 0 };
-  const emberSize = { value: EMBER_PIXELS };
   const smoke = createSmokeSlots(group, clock);
-  const embers = createEmberSlots(group, { clock, size: emberSize });
+  const vines = createVineSlots(group, clock);
   scene.add(group);
-  const every = [...smoke, ...embers];
-  return { group, clock, emberSize, slots: { smoke, embers }, every, live: 0 };
-};
-
-const showAll = (fx: DuelFx, isVisible: boolean): void => {
-  for (const slot of fx.every) {
-    slot.object.visible = isVisible;
-  }
-};
-
-export const warmDuelFx = (fx: DuelFx, { renderer, camera }: FxView): void => {
-  showAll(fx, true);
-  renderer.render(fx.group, camera);
-  showAll(fx, false);
+  return {
+    group,
+    clock,
+    vines: vines.kit,
+    slots: { smoke, vines: vines.slots },
+    every: [...smoke, ...vines.slots],
+    live: 0,
+    turns: Math.floor(Math.random() * TURN_VARIANTS),
+  };
 };
 
 const stopSlot = (fx: DuelFx, slot: FxSlot): void => {
@@ -66,21 +61,29 @@ const stopSlot = (fx: DuelFx, slot: FxSlot): void => {
   slot.object.visible = false;
 };
 
-const startSlot = (fx: DuelFx, slot: FxSlot | undefined, point: TablePoint): void => {
-  if (slot === undefined) return;
+const startSlot = (fx: DuelFx, slot: FxSlot, point: TablePoint): void => {
   if (!slot.active) fx.live += 1;
   slot.active = true;
   slot.start.value = fx.clock.value;
-  slot.object.position.set(point.x, CARD_Y + FX_LIFT, point.z);
+  slot.end.value = STILL_BURNING;
+  slot.object.position.set(point.x, slot.object.position.y, point.z);
   slot.object.visible = true;
+};
+
+const startKind = (fx: DuelFx, kind: DuelFxKind | null, { duel, point }: FxPlace): void => {
+  const slot = kind === null ? undefined : fx.slots[kind][duel];
+  if (slot === undefined) return;
+  startSlot(fx, slot, point);
+  if (kind !== 'vines') return;
+  turnVine(slot, vineTurn(point.x, fx.turns));
+  fx.turns += 1;
 };
 
 export const startDuelFx = (fx: DuelFx, cue: DuelFxCue): void => {
   const kinds = duelFx(cue.looks, cue.isReduced);
-  fx.emberSize.value = EMBER_PIXELS * cue.pixelRatio;
+  fx.vines.still.value = cue.isReduced ? 1 : 0;
   for (const side of SIDES) {
-    const kind = kinds[side];
-    if (kind !== null) startSlot(fx, fx.slots[kind][cue.duel], slotPoint(side, cue.duel));
+    startKind(fx, kinds[side], { duel: cue.duel, point: slotPoint(side, cue.duel) });
   }
 };
 
@@ -88,12 +91,12 @@ export const updateDuelFx = (fx: DuelFx, deltaSeconds: number): void => {
   if (fx.live === 0) return;
   fx.clock.value += deltaSeconds;
   for (const slot of fx.every) {
-    if (slot.active && isFxOver(fx.clock.value - slot.start.value)) stopSlot(fx, slot);
+    if (slot.active && isFxOver(slot.end.value, fx.clock.value)) stopSlot(fx, slot);
   }
 };
 
 export const clearDuelFx = (fx: DuelFx): void => {
   for (const slot of fx.every) {
-    stopSlot(fx, slot);
+    if (slot.active && slot.end.value === STILL_BURNING) slot.end.value = fx.clock.value;
   }
 };

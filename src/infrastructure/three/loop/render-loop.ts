@@ -1,8 +1,6 @@
 import { Timer } from 'three';
 
 import { isCardMoving, updateCard } from '@infrastructure/three/cards/card-motion';
-import type { GlowFrame } from '@infrastructure/three/cards/duel-glows';
-import { updateGlows } from '@infrastructure/three/cards/duel-glows';
 import type { TableCard } from '@infrastructure/three/cards/table-card';
 import { areCoinsFlying, updateCoinFlights } from '@infrastructure/three/coins/coin-flights';
 import { trackSealHover } from '@infrastructure/three/interaction/seal-hover';
@@ -14,19 +12,23 @@ import { updateDuelMarks } from '@infrastructure/three/table/duel-marking';
 
 const MAX_DELTA_SECONDS = 0.05;
 
+interface Frame {
+  readonly time: number;
+  readonly deltaSeconds: number;
+}
+
 const visibleCards = (cards: readonly TableCard[]): TableCard[] =>
   cards.filter((card) => card.group.visible);
 
 const isTableMoving = (stage: Stage, cards: readonly TableCard[]): boolean =>
   areCoinsFlying(stage.coins) || cards.some((card) => isCardMoving(card));
 
-const animate = (stage: Stage, frame: GlowFrame): void => {
+const animate = (stage: Stage, frame: Frame): void => {
   const noise = flickerCandles(stage.candles, {
     time: frame.time,
     reducedMotion: stage.reducedMotion,
   });
   setBackgroundFlicker(stage.background, backgroundFlicker(noise));
-  updateGlows(stage.glows, frame, stage.reducedMotion);
   updateDuelMarks(stage, frame.deltaSeconds);
   const cards = visibleCards(stage.deck.everyCard);
   if (isTableMoving(stage, cards)) stage.shadowsDirty = true;
