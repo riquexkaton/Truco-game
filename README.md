@@ -33,7 +33,7 @@ Abre http://localhost:5173 y pulsa **JUGAR**.
 ## Controles
 
 - Toca una carta de tu mano o usa las teclas **1**, **2** y **3**.
-- **Cantar**: abre Ritual, Pacto y Desafío (o Contra). **Escape** lo cierra.
+- **Cantar**: abre Procesión, Llama y Desafío (o Contra). **Escape** lo cierra.
 - **Me voy**: abandonas la ronda y pierdes 1 de vida.
 - Toca un aviso para cerrarlo.
 

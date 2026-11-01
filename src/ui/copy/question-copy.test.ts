@@ -63,8 +63,9 @@ describe('question copy', () => {
       range: { min: 4, max: 20 },
       timeout: { seconds: 15, answer: null },
     });
-    expect(spec).toMatchObject({ voice: 'plain', seal: 'PACTO', timeoutLead: '' });
-    expect(namesOf(spec)).toEqual(['PACTO · 2', 'RE-PACTO · 4']);
+    expect(spec).toMatchObject({ voice: 'plain', seal: 'LLAMA', timeoutLead: '' });
+    expect(phrasesText(spec.message)).toBe('Quien tenga menos Llama recibe el daño.');
+    expect(namesOf(spec)).toEqual(['LLAMA · 2', 'AVIVAR · 4']);
     expect(spec.aside).toMatchObject({ label: 'CANCELAR', answer: null });
     expect(spec.raise).toMatchObject({ toggle: 'APOSTAR', min: 4, max: 20 });
     expect(spec.raise?.go(9)).toBe('APOSTAR 9');
@@ -76,12 +77,12 @@ describe('question copy', () => {
     const spec = promptFor(
       pactAnswer({ canRitual: true, canRepacto: true, range: { min: 4, max: 18 } }),
     );
-    expect(spec).toMatchObject({ voice: 'pacto', seal: 'PACTO' });
-    expect(phrasesText(spec.message)).toBe('«Quien tenga menos Pacto recibe 2 de daño.»');
-    expect(namesOf(spec)).toEqual(['ACEPTAR', 'RECHAZAR · −1', 'RE-PACTO · 4']);
+    expect(spec).toMatchObject({ voice: 'pacto', seal: 'LLAMA' });
+    expect(phrasesText(spec.message)).toBe('«Quien tenga menos Llama recibe 2 de daño.»');
+    expect(namesOf(spec)).toEqual(['ACEPTAR', 'RECHAZAR · −1', 'AVIVAR · 4']);
     expect(spec.aside).toMatchObject({
-      label: 'RITUAL',
-      detail: 'LO ANULA',
+      label: 'PROCESIÓN',
+      detail: 'LA ANULA',
       answer: { kind: 'ritual' },
     });
     expect(spec.raise?.toggle).toBe('SUBIR');
@@ -104,8 +105,17 @@ describe('question copy', () => {
     const spec = promptFor(
       pactAnswer({ bet: { kind: 'repacto', amount: 4 }, range: { min: 5, max: 20 } }),
     );
-    expect(spec.seal).toBe('RE-PACTO');
-    expect(promptAnnouncement(spec)).toBe('RE-PACTO. «Quien pierda recibe 4 de daño.»');
+    expect(spec.seal).toBe('AVIVAR');
+    expect(promptAnnouncement(spec)).toBe('AVIVAR. «Quien pierda recibe 4 de daño.»');
+  });
+
+  it('says the rival fans the Llama when it raises to Avivar', () => {
+    const spec = promptFor(
+      pactAnswer({ bet: { kind: 'repacto', amount: 4 }, previousAmount: 2, first: false }),
+    );
+    expect(promptAnnouncement(spec)).toBe(
+      'AVIVAR. El rival aviva la Llama. «Quien pierda recibe 4 de daño.»',
+    );
   });
 
   it('confirms folding and picks an effect to discard', () => {

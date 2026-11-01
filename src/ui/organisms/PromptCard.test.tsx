@@ -121,10 +121,10 @@ describe('the prompt card', () => {
       canRitual: true,
       canRepacto: true,
     });
-    const ritual = await screen.findByRole('button', { name: 'RITUAL · LO ANULA' });
+    const ritual = await screen.findByRole('button', { name: 'PROCESIÓN · LA ANULA' });
     const keys = [...document.querySelectorAll('[data-answer] kbd')].map((kbd) => kbd.textContent);
     expect(keys).toEqual(['1', '2', '3', '4']);
-    expect(button('RE-PACTO · 4').querySelector('kbd')?.textContent).toBe('3');
+    expect(button('AVIVAR · 4').querySelector('kbd')?.textContent).toBe('3');
     fireEvent.click(ritual);
     await expect(answer).resolves.toEqual({ kind: 'ritual' });
   });
@@ -171,11 +171,11 @@ describe('the prompt card', () => {
     await expect(answer).resolves.toEqual({ kind: 'apuesta', amount: 8 });
   });
 
-  it('bets everything with FALTA and lets the player cancel instead', async () => {
+  it('bets everything with A MUERTE and lets the player cancel instead', async () => {
     const hud = mount();
     const answer = askPactCall(hud);
     fireEvent.click(await screen.findByRole('button', { name: 'APOSTAR' }));
-    fireEvent.click(button('FALTA · 20'));
+    fireEvent.click(button('A MUERTE · 20'));
     fireEvent.click(button('APOSTAR 20'));
     await expect(answer).resolves.toEqual({ kind: 'apuesta', amount: 20 });
     const cancelled = askPactCall(hud);

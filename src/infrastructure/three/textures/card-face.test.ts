@@ -25,34 +25,41 @@ describe('cardFace', () => {
     expect(face).toMatchObject({ attack: 12, isSealed: true, label: 'LEGENDARIA' });
   });
 
-  it('greys out a wildcard whose vira is not active', () => {
+  it('greys out a sleeping Velador whose vela is another faction', () => {
     const face = cardFace(cardById('gaspar'), 'velo');
     expect(face).toMatchObject({
       attack: 6,
       isDormant: true,
       isSealed: false,
       accent: '#7D766C',
-      label: 'PERICO',
-      stampNote: 'INACTIVO',
+      label: 'VELADOR',
+      stampNote: 'DORMIDO',
       bandAlpha: 0.25,
       artFilter: 'grayscale(0.85)',
     });
   });
 
-  it('lights up an active perico with its boosted attack and seal', () => {
+  it('lights up an active Velador with its boosted attack and seal', () => {
     const face = cardFace(cardById('gaspar'), 'carnero');
     expect(face).toMatchObject({
       attack: 15,
       isActive: true,
       isSealed: true,
-      label: 'PERICO ACTIVO',
+      label: 'VELADOR ACTIVO',
       stampNote: 'BASE 6',
     });
   });
 
-  it('uses the feminine label for an active perica', () => {
-    const face = cardFace(cardById('ursula'), 'velo');
-    expect(face).toMatchObject({ attack: 14, label: 'PERICA ACTIVA', stampNote: 'BASE 5' });
+  it('uses the feminine words for the Veladora', () => {
+    expect(cardFace(cardById('ursula'), 'velo')).toMatchObject({
+      attack: 14,
+      label: 'VELADORA ACTIVA',
+      stampNote: 'BASE 5',
+    });
+    expect(cardFace(cardById('ursula'), 'lirio')).toMatchObject({
+      label: 'VELADORA',
+      stampNote: 'DORMIDA',
+    });
   });
 });
 

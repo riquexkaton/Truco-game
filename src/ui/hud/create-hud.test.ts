@@ -60,14 +60,14 @@ describe('the HUD notice queue', () => {
     expect(second.isDone).toBe(false);
     await advance(1);
     expect(second.isDone).toBe(true);
-    expect(view.banner.value?.title).toBe('RITUAL');
+    expect(view.banner.value?.title).toBe('PROCESIÓN');
   });
 
   it('only cuts a notice short when another one is waiting', async () => {
     const { port, view } = createHud({ reducedMotion: false });
     await port.notify(LOST_MARK);
     await advance(2000);
-    expect(view.mark.value?.title).toBe('RITUAL PERDIDO');
+    expect(view.mark.value?.title).toBe('PROCESIÓN PERDIDA');
     const next = settled(port.notify(CALLED));
     await advance(0);
     expect(next.isDone).toBe(true);
@@ -92,7 +92,7 @@ describe('the HUD notice queue', () => {
     expect(view.strip.value?.side).toBe('player');
     await port.notify(LOST_MARK);
     expect(view.strip.value).toBeNull();
-    expect(view.mark.value?.title).toBe('RITUAL PERDIDO');
+    expect(view.mark.value?.title).toBe('PROCESIÓN PERDIDA');
   });
 
   it('drops every waiting notice when a question opens', async () => {
@@ -124,13 +124,13 @@ describe('the HUD notices', () => {
   it('keeps the Pacto sheet up until the next round starts', async () => {
     const { port, view } = createHud({ reducedMotion: false });
     await port.notify(REVEALED);
-    expect(view.headline.value?.headline.title).toBe('PACTO PERDIDO');
+    expect(view.headline.value?.headline.title).toBe('LLAMA PERDIDA');
     const strip = settled(port.notify(WON));
     await advance(1200);
     expect(strip.isDone).toBe(true);
     expect(view.banner.value?.title).toBe('GANAS LA RONDA');
     await advance(5000);
-    expect(view.headline.value?.headline.title).toBe('PACTO PERDIDO');
+    expect(view.headline.value?.headline.title).toBe('LLAMA PERDIDA');
     await port.notify(ROUND);
     expect(view.headline.value).toBeNull();
   });

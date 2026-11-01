@@ -14,7 +14,15 @@ const CHALLENGE_CASES: [string, GameEvent, object][] = [
   [
     'challengeCalled',
     { type: 'challengeCalled', by: 'player', level: 2 },
-    mark({ title: 'CONTRA-DESAFÍO', detail: 'LA RONDA PASARÍA A VALER 6' }),
+    {
+      ...mark({
+        title: 'CONTRA-DESAFÍO',
+        detail: 'La ronda pasaría a valer 6.',
+        tone: 'lose',
+        isPending: true,
+      }),
+      announcement: 'CONTRA-DESAFÍO. La ronda pasaría a valer 6.',
+    },
   ],
   [
     'challengeAccepted with the word',
@@ -35,16 +43,30 @@ const PACT_CASES: [string, GameEvent, object][] = [
   [
     'pactCalled by the player',
     { type: 'pactCalled', by: 'player', bet: { kind: 'pacto', amount: 2 }, first: true },
-    mark({
-      title: 'CANTAS PACTO',
-      detail: 'Quien pierda recibe 2. Esperas la respuesta del rival.',
-      tone: 'ink',
-    }),
+    {
+      ...mark({
+        title: 'ENCIENDES LA LLAMA',
+        detail: 'Quien pierda recibe 2.',
+        tone: 'ink',
+        isPending: true,
+      }),
+      announcement: 'ENCIENDES LA LLAMA. Quien pierda recibe 2.',
+    },
   ],
   [
     'pactCalled as a raise',
     { type: 'pactCalled', by: 'player', bet: { kind: 'repacto', amount: 4 }, first: false },
-    mark({ title: 'SUBES · RE-PACTO' }),
+    mark({ title: 'AVIVAS LA LLAMA · 4', detail: 'Quien pierda recibe 4.', isPending: true }),
+  ],
+  [
+    'pactCalled with a wager',
+    { type: 'pactCalled', by: 'player', bet: { kind: 'apuesta', amount: 9 }, first: true },
+    mark({ title: 'ENCIENDES LA LLAMA · 9', detail: 'Quien pierda recibe 9.' }),
+  ],
+  [
+    'pactCalled as a raised wager',
+    { type: 'pactCalled', by: 'player', bet: { kind: 'apuesta', amount: 7 }, first: false },
+    mark({ title: 'SUBES LA LLAMA · 7', detail: 'Quien pierda recibe 7.' }),
   ],
   [
     'a rival raise, told by its prompt',
@@ -59,14 +81,14 @@ const PACT_CASES: [string, GameEvent, object][] = [
   [
     'pactRejected by the player',
     { type: 'pactRejected', by: 'player', damage: 1 },
-    mark({ title: 'NO QUIERES', detail: 'Rechazas el Pacto: pierdes 1.', tone: 'lose' }),
+    mark({ title: 'NO QUIERES', detail: 'Rechazas la Llama: pierdes 1.', tone: 'lose' }),
   ],
   [
     'pactAccepted by the rival',
     { type: 'pactAccepted', by: 'rival', amount: 4 },
     rivalMark({
       title: 'EL RIVAL QUISO',
-      detail: 'El Pacto vale 4: se revela al final de la ronda.',
+      detail: 'La Llama vale 4: se revela al final de la ronda.',
       tone: 'ink',
     }),
   ],
@@ -76,8 +98,8 @@ const PACT_CASES: [string, GameEvent, object][] = [
     headline({
       seal: '−2',
       tone: 'lose',
-      title: 'PACTO PERDIDO',
-      body: 'Tu Pacto: 27. El del rival: 31.',
+      title: 'LLAMA PERDIDA',
+      body: 'Tu Llama: 27. La del rival: 31.',
       result: 'PIERDES 2 DE VIDA',
     }),
   ],
@@ -86,8 +108,8 @@ const PACT_CASES: [string, GameEvent, object][] = [
     { type: 'pactRevealed', winner: 'player', amount: 4, playerValue: 25, rivalValue: 25 },
     headline({
       tone: 'win',
-      title: 'PACTO GANADO',
-      body: 'Tu Pacto: 25. El del rival: 25. Empate: gana quien empezó la ronda.',
+      title: 'LLAMA GANADA',
+      body: 'Tu Llama: 25. La del rival: 25. Empate: gana quien empezó la ronda.',
       result: 'EL RIVAL PIERDE 4',
     }),
   ],
@@ -144,8 +166,20 @@ const EFFECT_CASES: [string, GameEvent, object][] = [
   ],
 ];
 
+const ANSWERS: GameEvent[] = [
+  { type: 'challengeAccepted', by: 'rival', stake: 4, holder: null },
+  { type: 'pactAccepted', by: 'rival', amount: 4 },
+  { type: 'pactRejected', by: 'rival', damage: 2 },
+];
+
 describe('challenge, pact and effect copy', () => {
   it.each([...CHALLENGE_CASES, ...PACT_CASES, ...EFFECT_CASES])('maps %s', (_, event, expected) => {
     expect(noticeFor(event)).toMatchObject(expected);
+  });
+
+  it.each(ANSWERS)('shows the rival’s $type as settled, not pending', (event) => {
+    const notice = noticeFor(event);
+    expect(notice).toMatchObject({ kind: 'mark' });
+    expect(notice).not.toMatchObject({ mark: { isPending: true } });
   });
 });

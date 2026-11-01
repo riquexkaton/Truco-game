@@ -29,7 +29,7 @@ const ROUND_CASES: [string, GameEvent, object][] = [
         seal: { value: 'II', caption: '' },
         duration: 1500,
       }),
-      announcement: 'Vira: VELO. RONDA 2. SE REPARTEN 3 CARTAS · EMPIEZA EL RIVAL',
+      announcement: 'Vela: VELO. RONDA 2. SE REPARTEN 3 CARTAS · EMPIEZA EL RIVAL',
       clearsSheet: true,
     },
   ],
@@ -119,22 +119,24 @@ const DUEL_CASES: [string, GameEvent, object][] = [
   [
     'ritualSung',
     { type: 'ritualSung', side: 'player', annulsPact: false },
-    banner('RITUAL', 'CANTAS RITUAL · EL RIVAL RECIBE 3 Y TOMAS UN EFECTO', { duration: 1600 }),
+    banner('PROCESIÓN', 'SACAS LA PROCESIÓN · EL RIVAL RECIBE 3 Y TOMAS UN EFECTO', {
+      duration: 1600,
+    }),
   ],
   [
-    'a rival Ritual that annuls the Pacto',
+    'a rival Procesión that annuls the Llama',
     { type: 'ritualSung', side: 'rival', annulsPact: true },
-    banner('RITUAL', 'EL RIVAL CANTA RITUAL Y ANULA TU PACTO · RECIBES 3'),
+    banner('PROCESIÓN', 'EL RIVAL SACA LA PROCESIÓN Y ANULA TU LLAMA · RECIBES 3'),
   ],
   [
-    'a Ritual answer that annuls the rival’s Pacto',
+    'a Procesión answer that annuls the rival’s Llama',
     { type: 'ritualSung', side: 'player', annulsPact: true },
-    banner('RITUAL', 'CANTAS RITUAL Y ANULAS SU PACTO · EL RIVAL RECIBE 3'),
+    banner('PROCESIÓN', 'SACAS LA PROCESIÓN Y ANULAS SU LLAMA · EL RIVAL RECIBE 3'),
   ],
   [
     'ritualLost',
     { type: 'ritualLost' },
-    mark({ title: 'RITUAL PERDIDO', detail: 'No lo cantaste antes de jugar.', tone: 'rule' }),
+    mark({ title: 'PROCESIÓN PERDIDA', detail: 'No la sacaste antes de jugar.', tone: 'rule' }),
   ],
   [
     'turnTimedOut',

@@ -46,13 +46,13 @@ const ritualLine = ({ side, annulsPact }: GameEventOf<'ritualSung'>): string => 
   return annulsPact
     ? bySide(
         side,
-        `CANTAS RITUAL Y ANULAS SU PACTO · EL RIVAL RECIBE ${damage}`,
-        `EL RIVAL CANTA RITUAL Y ANULA TU PACTO · RECIBES ${damage}`,
+        `SACAS LA PROCESIÓN Y ANULAS SU LLAMA · EL RIVAL RECIBE ${damage}`,
+        `EL RIVAL SACA LA PROCESIÓN Y ANULA TU LLAMA · RECIBES ${damage}`,
       )
     : bySide(
         side,
-        `CANTAS RITUAL · EL RIVAL RECIBE ${damage} Y TOMAS UN EFECTO`,
-        `EL RIVAL CANTA RITUAL · RECIBES ${damage} Y TOMA UN EFECTO`,
+        `SACAS LA PROCESIÓN · EL RIVAL RECIBE ${damage} Y TOMAS UN EFECTO`,
+        `EL RIVAL SACA LA PROCESIÓN · RECIBES ${damage} Y TOMA UN EFECTO`,
       );
 };
 
@@ -64,9 +64,14 @@ export const DUEL_NOTICES: DuelNotices = {
       detail: `${cardName(cardId)} lleva sello: ${bySide(side, 'ganas un efecto', 'el rival gana un efecto')}.`,
       tone: bySide(side, 'win', 'lose'),
     }),
-  ritualSung: (event) => bannerNotice(bannerCopy('RITUAL', ritualLine(event), { duration: 1600 })),
+  ritualSung: (event) =>
+    bannerNotice(bannerCopy('PROCESIÓN', ritualLine(event), { duration: 1600 })),
   ritualLost: () =>
-    markNotice({ title: 'RITUAL PERDIDO', detail: 'No lo cantaste antes de jugar.', tone: 'rule' }),
+    markNotice({
+      title: 'PROCESIÓN PERDIDA',
+      detail: 'No la sacaste antes de jugar.',
+      tone: 'rule',
+    }),
   turnTimedOut: ({ cardId }) =>
     markNotice({
       title: 'SE ACABÓ EL TIEMPO',

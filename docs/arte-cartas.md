@@ -28,7 +28,7 @@ Se genera en el ComfyUI local con el estilo tarot anime de las cartas aprobadas.
 | Velo    | clan de la sangre        | vampiros, velos rojos, cálices, velas, gótico                |
 | Lirio   | culto del sol negro      | sol negro, halos dorados, lirios blancos, templos            |
 
-Legendaria = soberano en trono; Perico/Perica = héroes destacados (la Perica sobre una bestia).
+Legendaria = soberano en trono; Velador/Veladora = héroes destacados (la Veladora sobre una bestia).
 
 ## Integración
 

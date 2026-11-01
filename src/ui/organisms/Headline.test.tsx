@@ -35,7 +35,7 @@ describe('the Pacto sheet', () => {
     await hud.port.notify(REVEALED);
     const sheet = await screen.findByRole('button', { name: LABEL });
     expect(sheet.getAttribute('aria-label')).toBe(
-      'PACTO GANADO. Tu Pacto: 31. El del rival: 27. EL RIVAL PIERDE 4. Toca para cerrar.',
+      'LLAMA GANADA. Tu Llama: 31. La del rival: 27. EL RIVAL PIERDE 4. Toca para cerrar.',
     );
     expect(sheet.textContent).not.toContain('PARA SEGUIR');
     expect(sheet.textContent).toContain('EL RIVAL PIERDE 4');

@@ -1,9 +1,20 @@
 import { attackOf, hasSeal, isWildcardActive } from '@domain/cards/attack';
-import type { Card, CardId } from '@domain/cards/card';
+import type { Card, CardId, WildcardKind } from '@domain/cards/card';
 import type { FactionId } from '@domain/cards/faction';
 import { FACTIONS } from '@domain/cards/faction';
 
 import { DORMANT_GREY } from '@infrastructure/three/textures/palette';
+
+interface WildcardWords {
+  readonly name: string;
+  readonly awake: string;
+  readonly asleep: string;
+}
+
+const WILDCARD_WORDS: Readonly<Record<WildcardKind, WildcardWords>> = {
+  perico: { name: 'VELADOR', awake: 'ACTIVO', asleep: 'DORMIDO' },
+  perica: { name: 'VELADORA', awake: 'ACTIVA', asleep: 'DORMIDA' },
+};
 
 export interface CardFace {
   readonly card: Card;
@@ -18,20 +29,19 @@ export interface CardFace {
   readonly artFilter: string;
 }
 
-const wildcardLabel = (card: Card, isActive: boolean): string => {
-  const kind = card.wildcard?.kind === 'perica' ? 'PERICA' : 'PERICO';
-  if (!isActive) return kind;
-  return `${kind} ${kind === 'PERICA' ? 'ACTIVA' : 'ACTIVO'}`;
-};
+const wildcardLabel = ({ name, awake }: WildcardWords, isActive: boolean): string =>
+  isActive ? `${name} ${awake}` : name;
 
 const labelOf = (card: Card, isActive: boolean): string => {
   if (card.legendary) return 'LEGENDARIA';
-  return card.wildcard === null ? FACTIONS[card.faction].shortName : wildcardLabel(card, isActive);
+  return card.wildcard === null
+    ? FACTIONS[card.faction].shortName
+    : wildcardLabel(WILDCARD_WORDS[card.wildcard.kind], isActive);
 };
 
 const stampNoteOf = (card: Card, isActive: boolean): string | null => {
   if (card.wildcard === null) return null;
-  return isActive ? `BASE ${String(card.attack)}` : 'INACTIVO';
+  return isActive ? `BASE ${String(card.attack)}` : WILDCARD_WORDS[card.wildcard.kind].asleep;
 };
 
 export const cardFace = (card: Card, vira: FactionId): CardFace => {

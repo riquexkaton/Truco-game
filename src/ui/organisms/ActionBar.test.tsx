@@ -42,7 +42,7 @@ const mount = (model: ActionBarModel) => {
   return handlers;
 };
 
-const cantar = () => screen.getByRole('button', { name: 'Cantar: Ritual, Pacto o Desafío' });
+const cantar = () => screen.getByRole('button', { name: 'Cantar: Procesión, Llama o Desafío' });
 
 afterEach(() => {
   cleanup();
@@ -108,7 +108,7 @@ describe('the action bar', () => {
 
   it('shows the stakes in play while the menu is closed', () => {
     mount(modelWith({ pactAmount: 4, roundStake: 6 }));
-    expect(screen.getByText('PACTO · 4')).toBeTruthy();
+    expect(screen.getByText('LLAMA · 4')).toBeTruthy();
     expect(screen.getByText('RONDA · VALE 6')).toBeTruthy();
   });
 });

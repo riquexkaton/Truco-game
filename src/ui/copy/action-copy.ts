@@ -21,16 +21,16 @@ export const FOLD_COPY = {
 
 export const CANTAR_COPY = {
   label: 'CANTAR',
-  description: 'Cantar: Ritual, Pacto o Desafío',
+  description: 'Cantar: Procesión, Llama o Desafío',
   menu: 'Cantar',
-  ready: 'Ritual listo',
+  ready: 'Procesión lista',
 };
 
 export const RITUAL_ITEM: MenuItemCopy = {
-  label: 'RITUAL',
-  note: 'LISTO',
+  label: 'PROCESIÓN',
+  note: 'LISTA',
   description:
-    'Ritual: tus 3 cartas son de la misma facción. Hace 3 de daño y te da un efecto. Cántalo antes de jugar o lo pierdes',
+    'Procesión: tus 3 cartas son de la misma facción. Hace 3 de daño y te da un efecto. Sácala antes de jugar o la pierdes',
 };
 
 const isContra = ({ level, holder }: ChallengeView): boolean => level === 1 && holder === 'player';
@@ -53,27 +53,26 @@ export const challengeItemCopy = (challenge: ChallengeView): MenuItemCopy => {
 export const pactItemCopy = ({ ritualSung, pendingAmount }: PactState): MenuItemCopy => {
   if (ritualSung) {
     return {
-      label: 'PACTO',
-      note: 'ANULADO',
-      description: 'Se cantó Ritual en esta ronda: el Ritual anula el Pacto',
+      label: 'LLAMA',
+      note: 'ANULADA',
+      description: 'Se sacó la Procesión en esta ronda: la Procesión anula la Llama',
     };
   }
   if (pendingAmount !== null) {
     const amount = num(pendingAmount);
     return {
-      label: 'PACTO',
+      label: 'LLAMA',
       note: `EN JUEGO · ${amount}`,
-      description: `Pacto aceptado por ${amount}: el ganador se revela al final de la ronda`,
+      description: `Llama aceptada por ${amount}: el ganador se revela al final de la ronda`,
     };
   }
   return {
-    label: 'PACTO',
+    label: 'LLAMA',
     note: 'VALE 2',
-    description:
-      'Pacto (como el envido): 2 cartas de la misma facción suman +20; las de ataque 10 o más valen 0',
+    description: 'Llama: 2 cartas de la misma facción suman +20; las de ataque 10 o más valen 0',
   };
 };
 
-export const pactStakeLabel = (amount: number): string => `PACTO · ${num(amount)}`;
+export const pactStakeLabel = (amount: number): string => `LLAMA · ${num(amount)}`;
 
 export const roundStakeLabel = (stake: number): string => `RONDA · VALE ${num(stake)}`;

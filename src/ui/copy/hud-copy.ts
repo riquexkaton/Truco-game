@@ -50,4 +50,6 @@ export const timerLabel = (seconds: number): string => `Quedan ${num(seconds)} s
 export const wagerLabel = (min: number, max: number): string =>
   `Valor de la apuesta, de ${num(min)} a ${num(max)}`;
 
-export const faltaLabel = (max: number): string => `FALTA · ${num(max)}`;
+export const FALTA_COPY = { label: 'A MUERTE' };
+
+export const faltaLabel = (max: number): string => `${FALTA_COPY.label} · ${num(max)}`;

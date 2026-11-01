@@ -33,9 +33,9 @@ export const TITLE_CARDS: readonly TitleCardCopy[] = [
   {
     id: 'rules',
     label: 'REGLAS',
-    chip: 'Ritual · Pacto · Desafío',
+    chip: 'Procesión · Llama · Desafío',
     description:
-      'Aprende los duelos, la vira, el Perico y la Perica, y cuándo cantar Desafío, Pacto o Ritual.',
+      'Aprende los duelos, la vela, los Veladores y cuándo desafiar, encender la Llama o sacar la Procesión.',
   },
   {
     id: 'deck',

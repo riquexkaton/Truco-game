@@ -6,8 +6,8 @@ import type { Side } from '@domain/shared/side';
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
 export const BET_NAMES: Readonly<Record<BetKind, string>> = {
-  pacto: 'PACTO',
-  repacto: 'RE-PACTO',
+  pacto: 'LLAMA',
+  repacto: 'AVIVAR',
   apuesta: 'APUESTA',
 };
 

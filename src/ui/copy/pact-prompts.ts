@@ -38,10 +38,15 @@ const raiseSpec = <A>(
 const answerSeal = ({ bet }: PactAnswerQuestion): string =>
   bet.kind === 'apuesta' ? `${BET_NAMES.apuesta} · ${num(bet.amount)}` : BET_NAMES[bet.kind];
 
-const answerMessage = ({ bet, first }: PactAnswerQuestion): readonly Phrase[] => {
-  const who = bet.kind === 'pacto' ? 'Quien tenga menos Pacto' : 'Quien pierda';
-  const lead = first ? '' : 'El rival sube. ';
-  return [say(`${lead}«${who} recibe `), stress(damage(bet.amount)), say('.»')];
+const raiseLead = ({ bet, first }: PactAnswerQuestion): string => {
+  if (first) return '';
+  return bet.kind === 'repacto' ? 'El rival aviva la Llama. ' : 'El rival sube. ';
+};
+
+const answerMessage = (question: PactAnswerQuestion): readonly Phrase[] => {
+  const { bet } = question;
+  const who = bet.kind === 'pacto' ? 'Quien tenga menos Llama' : 'Quien pierda';
+  return [say(`${raiseLead(question)}«${who} recibe `), stress(damage(bet.amount)), say('.»')];
 };
 
 const betOption = <A>(bet: Bet, answer: A, variant: 'main' | 'plain') =>
@@ -60,15 +65,15 @@ const answerOptions = (question: PactAnswerQuestion): PromptOption<PactAnswer>[]
 ];
 
 const ritualOption = ({ canRitual }: PactAnswerQuestion): PromptOption<PactAnswer> | null =>
-  canRitual ? option<PactAnswer>('RITUAL', { kind: 'ritual' }, { detail: 'LO ANULA' }) : null;
+  canRitual ? option<PactAnswer>('PROCESIÓN', { kind: 'ritual' }, { detail: 'LA ANULA' }) : null;
 
 const raiseTo = (amount: number): PactAnswer => ({ kind: 'raise', bet: wager(amount) });
 
 export const PACT_PROMPTS: PactPrompts = {
   pactCall: ({ range, timeout }) => ({
     voice: 'plain',
-    seal: 'PACTO',
-    message: [say('Quien tenga menos Pacto recibe el daño.')],
+    seal: BET_NAMES.pacto,
+    message: [say('Quien tenga menos Llama recibe el daño.')],
     options: [
       betOption<Answer<'pactCall'>>(PACT_BET, PACT_BET, 'main'),
       betOption<Answer<'pactCall'>>(REPACT_BET, REPACT_BET, 'plain'),

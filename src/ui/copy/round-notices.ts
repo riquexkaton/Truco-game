@@ -47,7 +47,7 @@ const roundStartedNotice = ({ round, lead, vira }: GameEventOf<'roundStarted'>) 
       bySide(lead, 'SE REPARTEN 3 CARTAS · EMPIEZAS TÚ', 'SE REPARTEN 3 CARTAS · EMPIEZA EL RIVAL'),
       { duration: 1500, seal: { value: roman(round), caption: '' } },
     ),
-    `Vira: ${FACTIONS[vira].name}. `,
+    `Vela: ${FACTIONS[vira].name}. `,
   ),
   clearsSheet: true,
 });

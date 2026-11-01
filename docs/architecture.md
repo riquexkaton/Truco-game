@@ -35,11 +35,11 @@ domain/
   cards/       facciones, mazo de 40 (datos), attackOf, effectiveAttack, hasSeal
   duel/        resultado de duelo, estado de la ronda (2 de 3), quién lidera
   challenge/   Desafío/Contra: niveles [2,4,6], canRaise, daño por retirarse (1 / 4) y por irse (1 / 4 / 6)
-  pact/        valor del Pacto (envido), apuestas Pacto/Re-pacto/Apuesta, rango, rechazo, ganador
-  ritual/      detección (3 de la misma facción), daño 3
+  pact/        valor de la Llama, apuestas Llama/Avivar/Apuesta, rango, rechazo, ganador
+  ritual/      Procesión: detección (3 de la misma facción), daño 3
   effects/     catálogo (golpe, sanacion, saqueo, maldicion, sello), mazo de 20, robar/rebarajar, máx. 2
   life/        vida 0..20, aplicar cambio y devolver el cambio real
-  rival/       IA del rival: fuerza de mano, carta a jugar, responder/lanzar Desafío, Pacto, efecto, descarte
+  rival/       IA del rival: fuerza de mano, carta a jugar, responder/lanzar Desafío, Llama, efecto, descarte
   match/       MatchState inmutable + transiciones puras (nueva partida, nueva ronda)
 ```
 
@@ -47,23 +47,28 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 
 ## Glosario (juego → código)
 
+El jugador ve los nombres propios del juego (Vela, Velador, Llama, Avivar, Procesión). El código conserva los identificadores originales (`vira`, `perico`, `pact`, `'repacto'`, `ritual`): el copy de `src/ui/copy/` y la etiqueta de la cara de la carta (`three/textures/card-face.ts`) traducen uno a otro.
+
 | Juego                                | Código                                                                        |
 | ------------------------------------ | ----------------------------------------------------------------------------- |
 | Partida / Ronda / Duelo              | `match` / `round` / `duel`                                                    |
 | Jugador / Rival                      | `Side`: `'player'` / `'rival'`                                                |
-| Vira                                 | `vira`                                                                        |
-| Perico / Perica                      | `wildcard.kind`: `'perico'` / `'perica'`                                      |
+| Vela (mazo de velas)                 | `vira`                                                                        |
+| Velador / Veladora                   | `wildcard.kind`: `'perico'` / `'perica'`                                      |
+| Despierto / dormido                  | `isWildcardActive(card, vira)` true / false                                   |
 | Carta con sello (da efecto al ganar) | `hasSeal(card, vira)`                                                         |
 | Desafío / Contra                     | `challenge` nivel 1 / 2                                                       |
 | Retirarse / Me voy                   | `retire` / `fold`                                                             |
-| Pacto / Re-pacto / Apuesta           | `pact`, `Bet.kind`: `'pacto'` / `'repacto'` / `'apuesta'`                     |
-| Ritual                               | `ritual`                                                                      |
+| Llama / Avivar / Apuesta             | `pact`, `Bet.kind`: `'pacto'` / `'repacto'` / `'apuesta'`                     |
+| Apuesta máxima («A MUERTE · n»)      | `WagerRange.max`, `faltaLabel`                                                |
+| Procesión                            | `ritual` (sacarla: `singRitual`)                                              |
+| Encender la Llama                    | `callPact`, evento `pactCalled`                                               |
 | Efectos                              | `EffectId`: `'golpe'` / `'sanacion'` / `'saqueo'` / `'maldicion'` / `'sello'` |
 
 ## Application
 
 - `ports/`: `TablePort` (animaciones 3D, todas devuelven `Promise`), `HudPort` (`notify(evento)` y `ask(pregunta)`; `notify` se resuelve cuando el aviso aparece, no cuando se va: el HUD lleva su propia cola para que no se pisen, pero el juego no espera a que se cierren; solo `ask` para el reloj del turno), `Scheduler` (`wait(ms)`), `Random`, `TableListener` (la mesa 3D avisa a la UI de una carta jugada tocada, de la carta con sello bajo el ratón y de que se recogió la mesa; lo une `composition/launcher.ts`).
-- `store/`: estado observable con `@preact/signals-core` (vida, resultados de duelos, apuesta, Pacto en juego, efectos, maldición/sello, fase, temporizador). La UI solo lee de aquí y llama comandos.
+- `store/`: estado observable con `@preact/signals-core` (vida, resultados de duelos, apuesta, Llama en juego, efectos, maldición/sello, fase, temporizador). La UI solo lee de aquí y llama comandos.
 - Casos de uso por carpeta (`round/`, `challenge/`, `pact/`, `effects/`, `turn-timer/`) que reciben sus dependencias por parámetro. Nada de singletons.
 - `GameCommands`: `start`, `playCard`, `callChallenge`, `callPact`, `singRitual`, `fold`, `useEffect`, `restart`.
 
@@ -72,7 +77,7 @@ Toda decisión con azar recibe un `Random`. Las funciones del dominio son puras 
 - `three/`: un archivo por pieza (renderer, fondo, velas, entorno, monedas, carta, pintores de textura, layouts, picking, loop, adaptador). Se carga con `import()` dinámico al pulsar JUGAR.
 - `browser/`: `Scheduler` con `setTimeout` (acorta esperas con reduced motion), `Random` con `Math.random`, carga de imágenes con `createImageBitmap`.
 - Música de fondo: `composition/background-music.ts` une `music-track` (un `Audio` en bucle que se crea en el primer gesto y entra con fundido), `music-preference` (`localStorage`) y `page-activity` (primer gesto, visibilidad) en un `MusicControl` que `main.tsx` pasa a `App`. La UI solo lee `isEnabled` y llama a `toggle`. El encendido, el primer gesto y la visibilidad viven en `composition/audio-toggle.ts`, compartido con los efectos.
-- Efectos de sonido: `composition/sound-effects.ts` crea `sfx-engine` (Web Audio: un `AudioContext`, buffers decodificados y un `BufferSource` nuevo por sonido, así se superponen) y lo une con `sfx-preference` y `page-activity` en un `SfxControl` aparte. Los sonidos se descargan y decodifican después del primer gesto; si falta uno, no suena. El volumen de cada sonido es dato: sonoridad medida y objetivo en LUFS. Se disparan desde dos sitios: `composition/hud-sounds.ts` envuelve el `HudPort` (llamadas de Pacto o Desafío, turnos, ronda y fin de partida) y la mesa 3D recibe `TableSounds` (`three/table/table-sounds.ts`) para sonar cuando la carta llega a la mano o a la mesa, al recoger, al tomar un efecto y cuando cada moneda toca la mesa.
+- Efectos de sonido: `composition/sound-effects.ts` crea `sfx-engine` (Web Audio: un `AudioContext`, buffers decodificados y un `BufferSource` nuevo por sonido, así se superponen) y lo une con `sfx-preference` y `page-activity` en un `SfxControl` aparte. Los sonidos se descargan y decodifican después del primer gesto; si falta uno, no suena. El volumen de cada sonido es dato: sonoridad medida y objetivo en LUFS. Se disparan desde dos sitios: `composition/hud-sounds.ts` envuelve el `HudPort` (llamadas de Llama o Desafío, turnos, ronda y fin de partida) y la mesa 3D recibe `TableSounds` (`three/table/table-sounds.ts`) para sonar cuando la carta llega a la mano o a la mesa, al recoger, al tomar un efecto y cuando cada moneda toca la mesa.
 
 ## UI
 
