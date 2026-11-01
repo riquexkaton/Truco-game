@@ -120,14 +120,26 @@ describe('resolveDuel', () => {
     expect(state).toMatchObject({ roundOver: true, roundWinner: 'player' });
   });
 
-  it('ends a 1-1 round with a tie in the first duel without a winner', () => {
+  it('gives a 1-1 round to whoever won a duel first', () => {
     const third = matchFixture({
       duel: 2,
-      results: ['tie', 'player'],
-      played: playedOf([played('teo'), played('rui')], [played('paula'), played('lucia')]),
+      results: ['player', 'rival'],
+      hands: handsOf(['saul'], ['celia']),
+      played: playedOf([played('rui'), played('teo')], [played('lucia'), played('irene')]),
     });
-    const { state } = resolveDuel(duelOf(third, 'irene', 'oriana'), scriptedRandom());
-    expect(state).toMatchObject({ roundOver: true, roundWinner: null, duel: 3 });
+    const { state } = resolveDuel(duelOf(third, 'saul', 'celia'), scriptedRandom());
+    expect(state).toMatchObject({ roundOver: true, roundWinner: 'player', duel: 3 });
+  });
+
+  it('ends the round when a tie leaves only one side with a win', () => {
+    const second = matchFixture({
+      duel: 1,
+      results: ['rival'],
+      hands: handsOf(['saul'], ['celia']),
+      played: playedOf([played('teo')], [played('rui')]),
+    });
+    const { state } = resolveDuel(duelOf(second, 'saul', 'celia'), scriptedRandom());
+    expect(state).toMatchObject({ roundOver: true, roundWinner: 'rival', duel: 2 });
   });
 
   it('refuses to resolve before both cards are down', () => {

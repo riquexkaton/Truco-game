@@ -25,5 +25,4 @@ Juego de cartas 3D contra la IA, inspirado en el truco venezolano. Vite + TypeSc
 
 ## Pendiente
 
-- Duelo empatado: el aviso dice «DECIDE EL SIGUIENTE DUELO», pero se juegan los 3 duelos (comportamiento heredado). Falta decidir cuál es el correcto.
 - Mano que se ilumina en tu turno · multijugador en línea.

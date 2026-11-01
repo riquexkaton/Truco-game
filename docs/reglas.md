@@ -88,7 +88,9 @@ Tu **turno** es el momento en que te toca poner tu carta en un duelo. Cada jugad
 - Si dos cartas empatan, ese duelo no cuenta para nadie.
 - Después de un empate, en el siguiente duelo juega primero quien jugó primero en el duelo empatado.
 - Si al final ninguno ganó 2 duelos, gana la ronda quien haya ganado más duelos.
-- Si siguen empatados, nadie recibe daño.
+- Si quedan igualados en duelos ganados, gana la ronda quien mató primero (quien ganó el primer duelo que no fue empate).
+- Por eso, si después de dos duelos solo uno de los dos ganó alguno, la ronda termina ahí: el tercer duelo ya no puede cambiar el resultado.
+- Si todos los duelos fueron empates, nadie recibe daño.
 
 ---
 

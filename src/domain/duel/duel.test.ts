@@ -18,7 +18,11 @@ describe('round outcome', () => {
     [['rival', 'player', 'rival'], 'rival'],
     [['player', 'tie', 'tie'], 'player'],
     [['tie', 'tie', 'rival'], 'rival'],
-    [['tie', 'player', 'rival'], null],
+    [['tie', 'player', 'rival'], 'player'],
+    [['player', 'rival', 'tie'], 'player'],
+    [['rival', 'player', 'tie'], 'rival'],
+    [['player', 'tie'], 'player'],
+    [['tie', 'rival'], 'rival'],
     [['tie', 'tie', 'tie'], null],
   ];
 
@@ -27,9 +31,10 @@ describe('round outcome', () => {
     expect(roundWinnerOf(results)).toBe(winner);
   });
 
-  it('keeps playing until someone wins twice or three duels are played', () => {
+  it('keeps playing while the last duel can still change the winner', () => {
     expect(isRoundDecided(['player', 'rival'])).toBe(false);
-    expect(isRoundDecided(['tie', 'player'])).toBe(false);
+    expect(isRoundDecided(['tie', 'tie'])).toBe(false);
+    expect(isRoundDecided(['player'])).toBe(false);
     expect(isRoundDecided([])).toBe(false);
   });
 
