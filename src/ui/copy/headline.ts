@@ -13,6 +13,7 @@ export interface MarkCopy {
   readonly detail: string;
   readonly tone: Tone;
   readonly isRival?: boolean;
+  readonly isPending?: boolean;
 }
 
 const sentence = (text: string): string => (/[.!?»]$/.test(text) ? text : `${text}.`);

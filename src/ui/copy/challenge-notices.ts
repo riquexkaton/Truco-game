@@ -29,8 +29,9 @@ export const CHALLENGE_NOTICES: ChallengeNotices = {
   challengeCalled: ({ level }) =>
     markNotice({
       title: level === 1 ? 'DESAFÍO' : 'CONTRA-DESAFÍO',
-      detail: `LA RONDA PASARÍA A VALER ${num(STAKES[level])}`,
+      detail: `La ronda pasaría a valer ${num(STAKES[level])}.`,
       tone: 'lose',
+      isPending: true,
     }),
   challengeAccepted: acceptedNotice,
 };

@@ -20,6 +20,9 @@ const SEALS: Readonly<Record<BannerKind, string>> = {
 
 const END = 'absolute top-[10.5px] bottom-[10.5px] w-[60px] narrow:w-[38px]';
 
+const SUBTITLE =
+  'pl-[0.2em] text-center text-[13px] leading-normal font-extrabold tracking-[0.2em] text-balance text-ink/75 tall:pl-[0.28em] tall:text-[10px] tall:tracking-[0.28em] tall:text-wrap tall:text-ink/65';
+
 const Seal = ({ banner }: { readonly banner: BannerView }) =>
   banner.seal === null ? null : (
     <Hanko
@@ -45,11 +48,7 @@ export const Banner = ({ banner }: BannerProps) =>
       <b class="pl-[0.22em] text-center text-[clamp(18px,4.2vw,27px)] leading-[1.15] font-extrabold tracking-[0.2em] text-ink">
         {banner.title}
       </b>
-      {banner.subtitle === '' ? null : (
-        <span class="pl-[0.28em] text-center text-[10px] leading-normal font-extrabold tracking-[0.28em] text-ink/65">
-          {banner.subtitle}
-        </span>
-      )}
+      {banner.subtitle === '' ? null : <span class={SUBTITLE}>{banner.subtitle}</span>}
       <Seal banner={banner} />
     </div>
   );

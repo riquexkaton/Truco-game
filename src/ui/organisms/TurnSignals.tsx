@@ -1,11 +1,10 @@
 import { PaperTag } from '@ui/atoms/PaperTag';
+import { PendingDots } from '@ui/atoms/PendingDots';
 import { HUD_LABELS } from '@ui/copy/hud-copy';
 
 interface SignalProps {
   readonly isOn: boolean;
 }
-
-const DOT_DELAYS = ['0s', '0.2s', '0.4s'];
 
 export const EdgeGlow = ({ isOn }: SignalProps) => (
   <div
@@ -21,15 +20,7 @@ export const RivalTurnTag = ({ isOn }: SignalProps) => (
   >
     <PaperTag dot="bg-red" size="md">
       {HUD_LABELS.theirTurn}
-      <span class="flex gap-1">
-        {DOT_DELAYS.map((delay) => (
-          <i
-            key={delay}
-            class="block size-[5px] animate-dots rounded-full bg-red motion-reduce:animate-none"
-            style={{ animationDelay: delay }}
-          />
-        ))}
-      </span>
+      <PendingDots />
     </PaperTag>
   </div>
 );
